@@ -310,7 +310,10 @@ AN2CVB4C28000731        device
 
 如果没有看到任何设备，请检查数据线连接是否正常，以及手机上的 USB 调试选项是否正确开启。首次连接手机时，手机上可能会弹出授权提示，只需选择「允许」即可。如下图所示：
 
-![授权提示](images/developer_mode_auth.png){width=20%}
+<!-- ![授权提示](images/developer_mode_auth.png){width=20%} -->
+<div style="display: flex; align-items: center; justify-content: center; width: 80%; margin: 0 auto;">
+  <img src="images/developer_mode_auth.png" alt="授权提示" style="flex: 1; height: 230px; object-fit: contain; margin-right: 1px;"/>
+</div>
 
 如果仍然无法成功安装或连接，可以参考第三方文档进行进一步排查：https://github.com/quickappcn/issues/issues/120
 

@@ -345,7 +345,9 @@ AN2CVB4C28000731        device
 If you do not see any devices, please check if the USB cable and the USB debugging settings on your phone are correctly enabled. When connecting the phone for the first time, an authorization prompt may pop up on the phone; simply select "Allow." As shown in the image below:
 
 
-![Authorization Prompt](images/developer_mode_auth.png){width=20%}
+<div style="display: flex; align-items: center; justify-content: center; width: 80%; margin: 0 auto;">
+  <img src="images/developer_mode_auth.png" alt="Authorization Prompt on Xiaomi" style="flex: 1; height: 230px; object-fit: contain; margin-right: 1px;"/>
+</div>
 
 If the installation is unsuccessful, you can refer to third-party documentation: https://github.com/quickappcn/issues/issues/120 for further troubleshooting.
 
