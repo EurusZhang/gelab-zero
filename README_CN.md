@@ -282,7 +282,7 @@ ollama create gelab-zero-4b-preview -f Modelfile
 ollama create -q q8_0 gelab-zero-4b-preview 
 
 # 使用int4 精度量化模型（精度损失较大，模型尺寸变为2.2G ）：
-ollama create -q q4_0 gelab-zero-4b-preview
+ollama create -q Q4_K_M gelab-zero-4b-preview
 
 # 换回原始精度：
 ollama create -q f16 gelab-zero-4b-preview

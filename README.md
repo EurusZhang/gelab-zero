@@ -305,7 +305,7 @@ ollama create gelab-zero-4b-preview -f Modelfile
 ollama create -q q8_0 gelab-zero-4b-preview 
 
 # Quantize the model with int4 precision (large precision loss, model size becomes 2.2G):
-ollama create -q q4_0 gelab-zero-4b-preview
+ollama create -q Q4_K_M gelab-zero-4b-preview
 
 # Revert to the original precision:
 ollama create -q f16 gelab-zero-4b-preview
