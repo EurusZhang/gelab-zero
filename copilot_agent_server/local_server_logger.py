@@ -51,7 +51,8 @@ class LocalServerLogger(BaseLogger):
         if not smart_exists(self.log_target_file):
             return []
         
-        with smart_open(self.log_target_file, 'r') as f:
+        # with smart_open(self.log_target_file, 'r') as f:
+        with smart_open(self.log_target_file, 'r',encoding='utf-8') as f:
             reader = jsonlines.Reader(f)
             logs = [obj for obj in reader]
         
@@ -65,7 +66,8 @@ class LocalServerLogger(BaseLogger):
             "message": message_dict
         }
 
-        with smart_open(self.log_target_file, 'a') as f:
+        # with smart_open(self.log_target_file, 'a') as f:
+        with smart_open(self.log_target_file, 'a',encoding='utf-8') as f:
             writer = jsonlines.Writer(f)
             writer.write(log_message)
         
