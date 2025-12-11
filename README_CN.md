@@ -22,6 +22,22 @@
 ## 📰 新闻
 
 * 🎁 **[即将推出...]**
+* 🎁 **[2025-12-12]** MCP-Server ready：
+
+### Step1 启动 mcp server 以支持多设备管理和任务分发
+
+```bash
+# 启动mcp server
+python mcp_server/detailed_gelab_mcp_server.py
+```
+
+### Step2 在Chatbox 里引入MCP tools
+<!-- images/MCP-chatbox.png -->
+<div style="display: flex; align-items: center; justify-content: center; width: 80%; margin: 0 auto;">
+  <img src="images/MCP-chatbox.png" alt="MCP-Demo" style="flex: 1; height: 400px; object-fit: contain; margin-right: 1px;"/>
+</div>
+
+
 * 🎁 **[2025-12]** 感谢以下项目和作者提供的量化工具和教程：[GGUF_v1](https://huggingface.co/bartowski/stepfun-ai_GELab-Zero-4B-preview-GGUF)，[GGUF_v2](https://huggingface.co/noctrex/GELab-Zero-4B-preview-GGUF)，[EXL3](https://huggingface.co/ArtusDev/stepfun-ai_GELab-Zero-4B-preview-EXL3)，[Tutorials_CN](http://xhslink.com/o/1WrmgHGWFYh)，[Tutorials_EN](https://www.youtube.com/watch?v=4BMiDyQOpos)
 * 🎁 **[2025-11]** 我们在 [**Hugging Face**](https://huggingface.co/stepfun-ai/GELab-Zero-4B-preview) 和 [**Model Scope**](https://modelscope.cn/models/stepfun-ai/GELab-Zero-4B-preview) 上发布了一个轻量级的 **4B 模型**。
 * 🎁 **[2025-11]** 我们发布了来自 [**AndroidDaily**](https://huggingface.co/datasets/stepfun-ai/AndroidDaily) 基准测试的任务。
