@@ -246,7 +246,6 @@ def act_on_device(frontend_action, device_id, wm_size, print_command = False, re
         "param_key": param_value,
         ...
     }
-    With HiddenSurfaceControl
 
     """
     valid_actions = ["CLICK", "LONGPRESS", "TYPE", "SCROLL", "AWAKE", "SLIDE", "BACK", "HOME", "COMPLETE", "ABORT", "INFO", "WAIT", "HOT_KEY"]

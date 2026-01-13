@@ -6,3 +6,6 @@ running_log
 gelab-zero-4b-preview/
 
 model_config.yaml
+
+###################
+*.pyc

@@ -210,7 +210,6 @@ package_name_map = {
     "给到": "com.guanaitong",
     "百词斩": "com.jiongji.andriod.card",
     "企查查": "com.android.icredit",
-    "应用宝": "com.tencent.android.qqdownloader",
 }
 
 import difflib 
@@ -249,78 +248,3 @@ def get_list_of_package_names():
     """
     applications = [{"app_name": app_name, "package_name": package_name} for app_name, package_name in package_name_map.items()]
     return applications
-
-
-def find_LAUNCH_SINGLE_TOP_activity(adb_id, package_name):
-    """
-    Find LAUNCH_SINGLE_TOP activity name for each package
-    
-    Args:
-        package_name: The package name to find the activity for (e.g., com.taobao.taobao)
-    
-    Returns:
-        The activity name extracted from the logcat, or None if not found
-    """
-    import subprocess
-    import re
-    import time
-    
-    try:
-        # Step 1: Stop the package
-        stop_cmd = f'adb -s {adb_id} shell am force-stop {package_name}'
-        subprocess.run(stop_cmd, shell=True, check=True, capture_output=True, text=True)
-        print(f"Stopped package: {package_name}")
-        
-        # Wait a moment for the package to fully stop
-        time.sleep(1)
-        
-        # Step 2: Clear logcat buffer to avoid old logs
-        subprocess.run('adb logcat -c', shell=True, check=True, capture_output=True, text=True)
-        
-        # Step 3: Start the package (open to home/default interface)
-        # Using monkey command to launch the main activity
-        open_cmd = f'adb -s {adb_id} shell monkey -p {package_name} -c android.intent.category.LAUNCHER 1'
-        subprocess.run(open_cmd, shell=True, check=True, capture_output=True, text=True)
-        print(f"Opened package: {package_name}")
-        
-        # Wait for the app to launch and generate logs
-        time.sleep(5)
-        
-        # Step 4: Get logcat and filter for LAUNCH_SINGLE_TOP
-        logcat_cmd = f'adb -s {adb_id} shell "logcat -d -b all | grep LAUNCH_SINGLE_TOP"'
-        result = subprocess.run(logcat_cmd, shell=True, capture_output=True, text=True)
-        
-        if result.returncode != 0:
-            print(f"Failed to get logcat: {result.stderr}")
-            return None
-        
-        logcat_output = result.stdout
-        
-        # Step 5: Find the line containing both package_name and LAUNCH_SINGLE_TOP
-        # and extract the activity name after "cmp="
-        lines = logcat_output.split('\n')
-        for line in lines:
-            if package_name in line and 'LAUNCH_SINGLE_TOP' in line:
-                # Look for cmp= pattern
-                # Pattern: cmp=package_name/activity_name
-                match = re.search(r'cmp=([^\s]+)', line)
-                if match:
-                    cmp_value = match.group(1)
-                    # The cmp value is in format: package_name/activity_name
-                    # We want to return the full cmp value or just the activity name
-                    print(f"Found activity: {cmp_value}")
-                    return cmp_value
-        
-        print(f"No LAUNCH_SINGLE_TOP activity found for package: {package_name}")
-        return None
-        
-    except subprocess.CalledProcessError as e:
-        print(f"Error executing adb command: {e}")
-        return None
-    except Exception as e:
-        print(f"Unexpected error: {e}")
-        return None
-
-
-if __name__ == "__main__":
-    print(find_LAUNCH_SINGLE_TOP_activity(adb_id="9deb5ba5", package_name=find_package_name(app_name="点评")))

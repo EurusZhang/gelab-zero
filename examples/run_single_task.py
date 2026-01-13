@@ -4,14 +4,15 @@ import sys
 import time
 if "." not in sys.path:
     sys.path.append(".")
+import datetime
 
 from copilot_agent_client.pu_client import evaluate_task_on_device
 from copilot_front_end.mobile_action_helper import list_devices, get_device_wm_size
 from copilot_agent_server.local_server import LocalServer
 
 tmp_server_config = {
-    "log_dir": "running_log/server_log/os-copilot-local-eval-logs/traces",
-    "image_dir": "running_log/server_log/os-copilot-local-eval-logs/images",
+    "log_dir": f"running_log/server_log/os-copilot-local-eval-logs/{datetime.datetime.now().strftime("%Y-%m-%d_%H-%M-%S-%f")}/traces",
+    "image_dir": f"running_log/server_log/os-copilot-local-eval-logs/{datetime.datetime.now().strftime("%Y-%m-%d_%H-%M-%S-%f")}/images",
     "debug": False
 }
 
@@ -20,7 +21,7 @@ local_model_config = {
     "task_type": "parser_0922_summary",
     "model_config": {
         "model_name": "gelab-zero-4b-preview",
-        "model_provider": "local",
+        "model_provider": "vllm",
         "args": {
             "temperature": 0.1,
             "top_p": 0.95,
@@ -64,19 +65,21 @@ def wrap_automate_step_with_timing(server_instance):
 
 if __name__ == "__main__":
 
-     # task = "打开微信，给柏茗，发helloworld"
-    # task = "打开 给到 app，在主页，下滑寻找，员工权益-奋斗食代，帮我领劵。如果不能领取就退出。"
-    # task = "open wechat to send a message 'helloworld' to 'TKJ'"
-    #task = "去淘宝帮我买本书"
-    if len(sys.argv) < 2:
-        print("❌ 错误：未传入任务参数！")
-        print("📝 使用方法：")
-        print(f"   python {sys.argv[0]} \"你的任务描述\"")
-        print("   示例1：python script.py \"去淘宝帮我买本书\"")
-        print("   示例2：python script.py \"打开微信，给柏茗发helloworld\"")
-        sys.exit(1)  
+    #  # task = "打开微信，给柏茗，发helloworld"
+    # # task = "打开 给到 app，在主页，下滑寻找，员工权益-奋斗食代，帮我领劵。如果不能领取就退出。"
+    # # task = "open wechat to send a message 'helloworld' to 'TKJ'"
+    # #task = "去淘宝帮我买本书"
+    # if len(sys.argv) < 2:
+    #     print("❌ 错误：未传入任务参数！")
+    #     print("📝 使用方法：")
+    #     print(f"   python {sys.argv[0]} \"你的任务描述\"")
+    #     print("   示例1：python script.py \"去淘宝帮我买本书\"")
+    #     print("   示例2：python script.py \"打开微信，给柏茗发helloworld\"")
+    #     sys.exit(1)  
     
-    task = ' '.join(sys.argv[1:])
+    # task = ' '.join(sys.argv[1:])
+
+    task = "打开应用宝，下载并安装：大众点评，并打开它" # 大众点评，抖音，滴滴出行，腾讯视频，QQ音乐，高德地图
 
     # The device ID you want to use
     device_id = list_devices()[0]

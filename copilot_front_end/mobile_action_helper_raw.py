@@ -66,7 +66,6 @@ def close_app_on_device(device_id, app_name, print_command = False):
 def press_home_key(device_id, print_command = False):
     """
     Press the home key on the device.
-    With HiddenSurfaceControl
     """
     adb_command = _get_adb_command(device_id)
     
@@ -92,7 +91,7 @@ def init_device(device_id, print_command = False):
     if "29a0cd3b3adea92350dd5a25594593df" not in result.stdout:
         # to push yadb into the device
         command = f"{adb_command} push yadb /data/local/tmp"
-        print("YADB is not installed on the device. Installing now...")
+        print(f"YADB is not installed on the device. Installing now...")
 
         if print_command:
             # print(f"Executing command: {command}")
@@ -230,9 +229,6 @@ def list_devices():
         return []
 
 def _capture_save_screenshot(device_id, tmp_file_dir="tmp_screenshot", image_name = None, print_command = False):
-    """
-    With HiddenSurfaceControl
-    """
     if not os.path.exists(tmp_file_dir):
         os.makedirs(tmp_file_dir)
         print(f"Created temporary directory: {tmp_file_dir}")
@@ -518,7 +514,6 @@ def normlize_point(point, wm_size):
 def act_on_device(device_id, action, print_command = False, refush_app = True, device_wm_size = None):
     """
     Perform an action on a specific device.
-    With HiddenSurfaceControl
     """
     adb_command = _get_adb_command(device_id)
 
@@ -707,7 +702,7 @@ class BaseMoboleActionHelper:
 
 
         if not is_screenshot:
-            raise ValueError(f"Error capturing screenshot: {e}")  # noqa: F821
+            raise ValueError(f"Error capturing screenshot: {e}")
         # to check if the screenshot is valid
 
         if image_full_path is not None:
