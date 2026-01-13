@@ -5,3 +5,7 @@ local:
 stepfun:
     api_base: "https://api.stepfun.com/v1"
     api_key: "EMPTY"
+
+vllm:
+    api_base: "http://10.233.42.111:8010/v1"
+    api_key: "EMPTY"
