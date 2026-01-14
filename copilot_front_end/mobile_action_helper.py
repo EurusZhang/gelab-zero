@@ -6,12 +6,13 @@ from uuid import uuid4
 
 if "." not in sys.path:
     sys.path.append(".")
-from copilot_front_end.package_map import find_package_name
+from copilot_front_end.package_map import find_package_name, find_LAUNCH_SINGLE_TOP_activity
 
 import time
 from tqdm import tqdm
 
 from megfile import smart_copy
+from copilot_front_end.hidden_surface_control_utils import vdu
 
 def _get_adb_command(device_id=None):
     """
@@ -21,7 +22,7 @@ def _get_adb_command(device_id=None):
         adb_command = "adb "
     else:
         assert device_id in list_devices(), f"Device {device_id} not found in connected devices."
-        adb_command = f"adb -s {device_id} "
+        adb_command = f"adb -s {device_id}"
     return adb_command
 
 def get_adb_command(device_id=None):
@@ -68,13 +69,9 @@ def press_home_key(device_id, print_command = False):
     Press the home key on the device.
     With HiddenSurfaceControl
     """
-    adb_command = _get_adb_command(device_id)
-    
-    command = f"{adb_command} shell input keyevent 3"
+    command = vdu.send_home_key(device_id)
     if print_command:
         print(f"Executing command: {command}")
-    
-    subprocess.run(command, shell=True, capture_output=True, text=True)
 
 def init_device(device_id, print_command = False):
     """
@@ -207,8 +204,6 @@ def _open_screen(device_id, print_command = False):
         swipe_up_to_unlock(device_id, wm_size=get_device_wm_size(device_id), print_command=print_command)
         time.sleep(0.2)
 
-        
-
 def open_screen(device_id, print_command = False):
     """
     Open the screen of the specified device.
@@ -229,38 +224,61 @@ def list_devices():
         print(f"Error listing devices: {e}")
         return []
 
-def _capture_save_screenshot(device_id, tmp_file_dir="tmp_screenshot", image_name = None, print_command = False):
+def _capture_save_screenshot(device_id, tmp_file_dir="tmp_screenshot", image_name = None, print_command = False, ):
     """
     With HiddenSurfaceControl
     """
     if not os.path.exists(tmp_file_dir):
         os.makedirs(tmp_file_dir)
         print(f"Created temporary directory: {tmp_file_dir}")
-    
+
     adb_command = _get_adb_command(device_id)
-    
+
     if image_name is None:
         screen_shot_pic_name = f"uuid_{uuid4()}.png"
-    
+
     screen_shot_pic_path = os.path.join(tmp_file_dir, screen_shot_pic_name)
+    screenshot_folder = "/data/user/0/com.qualcomm.mobile.virtualdisplaydemo/cache/"
     try:
-        # result = subprocess.run([adb_command, 'shell', 'screencap', '-p'], capture_output=True, text=True)
-        command = f"{adb_command} shell screencap -p /sdcard/{screen_shot_pic_name}"
-        if print_command:   
-            print(f"Executing command: {command}")
-        subprocess.run(command, shell=True, capture_output=True, text=True)
-
-        # time.sleep(0.2)
-
-        command = f"{adb_command} pull /sdcard/{screen_shot_pic_name} {screen_shot_pic_path}"
+        # Clear screenshot folder /data/user/0/com.qualcomm.mobile.virtualdisplaydemo/cache/
+        command = f"{adb_command} shell rm -rf {screenshot_folder}"
         if print_command:
             print(f"Executing command: {command}")
         subprocess.run(command, shell=True, capture_output=True, text=True)
 
-        remove_command = f"{adb_command} shell rm /sdcard/{screen_shot_pic_name}"
+        # Take a screenshot
+        command = vdu.take_screenshot(device_id)
+        time.sleep(2)
         if print_command:
-            print(f"Executing command: {remove_command}")
-        subprocess.run(remove_command, shell=True, capture_output=True, text=True)
+            print(f"Executing command: {command}")
+
+        # Modify screenshot name
+        command = f"adb shell ls {screenshot_folder}"
+        if print_command:
+            print(f"Executing command: {command}")
+        result = subprocess.run(command, shell=True, capture_output=True, text=True)
+        if result.returncode == 0:
+            files = result.stdout.strip().split('\n')
+            old_name = files[0]
+            new_name = screen_shot_pic_name
+            old_path = screenshot_folder + old_name
+            new_path = screenshot_folder + new_name
+            rename_command = f"{adb_command} shell mv {old_path} {new_path}"
+            if print_command:
+                print(f"Executing command: {rename_command}")
+            rename_result = subprocess.run(rename_command, shell=True, capture_output=True, text=True)
+            if rename_result.returncode == 0:
+                print(f"Success to rename screenshot: {old_name} -> {new_name}")
+            else:
+                print(f"Fail to rename screenshot: {rename_result.stderr}")
+        else:
+            print(f"Fail to get screenshot name: {result.stderr}")
+
+        # Pull out screenshot
+        command = f"{adb_command} pull {new_path} {screen_shot_pic_path}"
+        if print_command:
+            print(f"Executing command: {command}")
+        subprocess.run(command, shell=True, capture_output=True, text=True)
 
         return screen_shot_pic_path
     except Exception as e:
@@ -514,63 +532,74 @@ def normlize_point(point, wm_size):
     real_world_point = ((float(point[0])) / wm_size[0], (float(point[1])) / wm_size[1])
     return real_world_point
 
+def _awake_activity(device_id=None, package_name=None, activity_name=None, print_command=False):
+    adb_command = _get_adb_command(device_id)
+    # firstly stop_virtual_display_service
+    command = vdu.stop_virtual_display_service(device_id)
+    if print_command:
+        print(f"Executing command: {command}")
+    # firstlt stop app
+    command = f"{adb_command} shell am force-stop {package_name}"
+    if print_command:
+        print(f"Executing command: {command}")
+    subprocess.run(command, shell=True, capture_output=True, text=True)
+    time.sleep(1)
+    # firstly stop virtual display scrcpy
+    vdu.taskkill_consoles()
+    # start activity
+    command = vdu.start_hidden_app(device_id, activity_name)
+    if print_command:
+        print(f"Executing command: {command}")
+    time.sleep(3)
+    # scrcpy virtual display
+    scrcpy_recording_folder = f"{os.getcwd()}//scrcpy_recording"
+    if not os.path.exists(scrcpy_recording_folder):
+        os.makedirs(scrcpy_recording_folder)
+    vdu.open_virtual_display(device_id, log_folder=scrcpy_recording_folder)
+    time.sleep(3)
+    # mirror virtual display to physical screen
+    vdu.start_mirror_activity(device_id)
+    time.sleep(3)
 
-def act_on_device(device_id, action, print_command = False, refush_app = True, device_wm_size = None):
+def act_on_device(device_id, action, print_command = False, reflush_app = True, device_wm_size = None):
     """
     Perform an action on a specific device.
     With HiddenSurfaceControl
     """
-    adb_command = _get_adb_command(device_id)
-
     if action['action_type'] == "Click":
-
         if device_wm_size is None:
             real_point = action['args']['point']
         else:
             normalized_point = action['args']['normalized_point']
             real_point = (int(normalized_point[0] * device_wm_size[0]), int(normalized_point[1] * device_wm_size[1]))
-        adb_command += f" shell input tap {real_point[0]} {real_point[1]}"
 
-    
-        # print(f"Executing command: {adb_command}")
+        command = vdu.touch_hidden_app(device_id, real_point[0], real_point[1])
+        if print_command:
+            print(f"Executing command: {command}")
+
     elif action['action_type'] == "Awake":
+        # find package name
         app_name = action['args']['text']
-
         package_name = find_package_name(app_name)
-        
         if package_name is None:
             raise ValueError(f"App {app_name} not found in package map.")
-        # adb shell monkey -p com.sankuai.meituan -c android.intent.category.LAUNCHER 1
-
-        if refush_app:
-            refush_command = f"{adb_command} shell am force-stop {package_name}"
-            if print_command:
-                print(f"Executing command: {refush_command}")
-            subprocess.run(refush_command, shell=True, capture_output=True, text=True)
-
-        # else:
-        adb_command = f"{adb_command} shell monkey -p {package_name} -c android.intent.category.LAUNCHER 1"
-        time.sleep(2)
-
-        # adb_command += f" shell monkey -p {package_name} -c android.intent.category.LAUNCHER 1"
+        activity_name = find_LAUNCH_SINGLE_TOP_activity(device_id, package_name)
+        _awake_activity(device_id, package_name, activity_name, print_command)
 
     elif action['action_type'] == "Type":
         text = action['args']['text']
-        # adb_command += f" shell input text '{text}'"
-        # adb shell app_process -Djava.class.path=/data/local/tmp/yadb /data/local/tmp com.ysbing.yadb.Main -keyboard 你好，世界
-
         if device_wm_size is None:
             point = action['args']['point']
         else:
             normalized_point = action['args']['normalized_point']
             point = (int(normalized_point[0] * device_wm_size[0]), int(normalized_point[1] * device_wm_size[1]))
-            
         if "keyboard_exists" in action['args'] and not action['args']['keyboard_exists']:
-            click_commmand = f"{adb_command} shell input tap {point[0]} {point[1]}"
-            subprocess.run(click_commmand, shell=True, capture_output=True, text=True)
-
-
-        adb_command += f' shell app_process -Djava.class.path=/data/local/tmp/yadb /data/local/tmp com.ysbing.yadb.Main -keyboard "{text}"'
+            command = vdu.touch_hidden_app(device_id, point[0], point[1])
+            if print_command:
+                print(f"Executing command: {command}")
+        command = vdu.text_hidden_app(device_id, text)
+        if print_command:
+            print(f"Executing command: {command}")
 
     elif action['action_type'] == "Pop":
         pass
@@ -578,49 +607,36 @@ def act_on_device(device_id, action, print_command = False, refush_app = True, d
     elif action['action_type'] == "Wait":
         wait_time = action['args']['duration']
         time.sleep(float(wait_time))
-
         return
     
     elif action['action_type'] == "Scroll":
         path = action['args']['path']
-
         if device_wm_size is not None:  
             normalized_path = action['args']['normalized_path']
             path = [(int(normalized_path[0][0] * device_wm_size[0]), int(normalized_path[0][1] * device_wm_size[1])),
                     (int(normalized_path[1][0] * device_wm_size[0]), int(normalized_path[1][1] * device_wm_size[1]))]
-
-        adb_command += f" shell input swipe {path[0][0]} {path[0][1]} {path[1][0]} {path[1][1]} 1000"
+        command = vdu.scroll_hidden_app(device_id, path[0][0], path[0][1], path[1][0], path[1][1], 1, 1000)
+        if print_command:
+            print(f"Executing command: {command}")
 
     elif action['action_type'] == "LongPress":
-        # adb shell app_process -Djava.class.path=/data/local/tmp/yadb /data/local/tmp com.ysbing.yadb.Main -touch 500 500 2000
-
         if device_wm_size is None:
             point = action['args']['point']
         else:
             normalized_point = action['args']['normalized_point']
             point = (int(normalized_point[0] * device_wm_size[0]), int(normalized_point[1] * device_wm_size[1]))
-
-        adb_command += f" shell app_process -Djava.class.path=/data/local/tmp/yadb /data/local/tmp com.ysbing.yadb.Main -touch {point[0]} {point[1]} 2000"
+        command = vdu.scroll_hidden_app(device_id, point[0], point[1], point[0], point[1], 1, 2000)
+        if print_command:
+            print(f"Executing command: {command}")
 
     elif action['action_type'] == "Abort":
-
         pass
 
     elif action['action_type'] == "Complete":
-
         pass
-
 
     else:
         raise ValueError(f"Invalid action type: {action['action_type']}")
-
-    if print_command:
-        print(f"Executing command: {adb_command}")
-
-    result = subprocess.run(adb_command, shell=True, capture_output=True, text=True)
-
-    if print_command:
-        print(f"Command output: {result.stdout}")
 
 
 def default_reply_method(task, envs, actions, question):

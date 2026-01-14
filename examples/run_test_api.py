@@ -1,5 +1,6 @@
 import sys
 import time
+import datetime
 from pathlib import Path
 import argparse
 
@@ -11,6 +12,11 @@ if str(PROJECT_DIR) not in sys.path:
 tmp_server_config = {
     "log_dir": str(PROJECT_DIR / "running_log/server_log/os-copilot-local-eval-logs/traces"),
     "image_dir": str(PROJECT_DIR / "running_log/server_log/os-copilot-local-eval-logs/images"),
+    "debug": False
+}
+tmp_server_config = {
+    "log_dir": f"running_log/server_log/os-copilot-local-eval-logs/{datetime.datetime.now().strftime("%Y-%m-%d_%H-%M-%S-%f")}/traces",
+    "image_dir": f"running_log/server_log/os-copilot-local-eval-logs/{datetime.datetime.now().strftime("%Y-%m-%d_%H-%M-%S-%f")}/images",
     "debug": False
 }
 

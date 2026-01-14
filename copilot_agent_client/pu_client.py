@@ -14,7 +14,7 @@ from tools.image_tools import draw_points, make_b64_url
 from copilot_front_end.mobile_action_helper import capture_screenshot, dectect_screen_on, press_home_key
 
 from copilot_front_end.mobile_action_helper import init_device, open_screen
-from copilot_front_end.pu_frontend_executor import act_on_device, uiTars_to_frontend_action
+from copilot_front_end.pu_frontend_executor import act_on_device, uiTars_to_frontend_action, _awake_activity
 
 from megfile import smart_remove
 
@@ -97,6 +97,10 @@ def evaluate_task_on_device(agent_server, device_info, task, rollout_config, ext
     open_screen(device_id)
     init_device(device_id)
 
+    # firstly start hidden surface control from Setting view to Home view
+    print("Init hidden surface control screen")
+    _awake_activity(device_id, "com.android.settings", "com.android.settings/com.android.settings.homepage.SettingsHomepageActivity", True)
+    press_home_key(device_id, print_command=True)
 
     if reset_environment:
         press_home_key(device_id, print_command=True)
@@ -134,7 +138,7 @@ def evaluate_task_on_device(agent_server, device_info, task, rollout_config, ext
             print("Screen is off, turn on the screen first")
             break
 
-        image_path = capture_screenshot(device_id, "tmp_screenshot", print_command=False)
+        image_path = capture_screenshot(device_id, "tmp_screenshot", print_command=True)
 
         image_b64_url = make_b64_url(image_path, resize_config=rollout_config['model_config'].get("resize_config", None))
         smart_remove(image_path)
@@ -154,7 +158,7 @@ def evaluate_task_on_device(agent_server, device_info, task, rollout_config, ext
             info_action = history_actions[-1]
 
             if auto_reply:
-                print(f"AUTO REPLY INFO FROM MODEL!")
+                print("AUTO REPLY INFO FROM MODEL!")
                 reply_info = reply_info_action(image_b64_url, task, info_action, model_provider=rollout_config['model_config']['model_provider'], model_name=rollout_config['model_config']['model_name'])
                 print(f"info: {reply_info}")
             

@@ -13,8 +13,8 @@ sys.path.append(os.path.dirname(os.path.abspath(__file__)))
 # add parent directory to sys.path
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
-from copilot_front_end.package_map import find_package_name
-
+from copilot_front_end.package_map import find_package_name, find_LAUNCH_SINGLE_TOP_activity
+from copilot_front_end.hidden_surface_control_utils import vdu
 
 def parser0729_to_frontend_action(parser_action):
     pass
@@ -221,6 +221,33 @@ def _detect_screen_orientation(device_id):
 
     return result
 
+def _awake_activity(device_id=None, package_name=None, activity_name=None, print_command=False):
+    # firstly stop_virtual_display_service
+    command = vdu.stop_virtual_display_service(device_id)
+    if print_command:
+        print(f"Executing command: {command}")
+    # firstlt stop app
+    command = f"adb -s {device_id} shell am force-stop {package_name}"
+    if print_command:
+        print(f"Executing command: {command}")
+    subprocess.run(command, shell=True, capture_output=True, text=True)
+    time.sleep(1)
+    # firstly stop virtual display scrcpy
+    vdu.taskkill_consoles()
+    # start activity
+    command = vdu.start_hidden_app(device_id, activity_name)
+    if print_command:
+        print(f"Executing command: {command}")
+    time.sleep(3)
+    # scrcpy virtual display
+    scrcpy_recording_folder = f"{os.getcwd()}//scrcpy_recording"
+    if not os.path.exists(scrcpy_recording_folder):
+        os.makedirs(scrcpy_recording_folder)
+    vdu.open_virtual_display(device_id, log_folder=scrcpy_recording_folder)
+    time.sleep(3)
+    # mirror virtual display to physical screen
+    vdu.start_mirror_activity(device_id)
+    time.sleep(3)
 
 def act_on_device(frontend_action, device_id, wm_size, print_command = False, reflush_app = True):
     """
@@ -256,21 +283,17 @@ def act_on_device(frontend_action, device_id, wm_size, print_command = False, re
 
     action_type = frontend_action["action_type"]
 
+    result = "PASS"
+
     if action_type == "CLICK":
         assert "point" in frontend_action, "Missing point in CLICK action"
-
         orientation = _detect_screen_orientation(device_id)
-
         if orientation in [1, 3]:
             wm_size = (wm_size[1], wm_size[0])
-
         x, y = _convert_point_to_realworld_point(frontend_action["point"], wm_size)
-
-        cmd = f"adb -s {device_id} shell input tap {x} {y}"
+        command = vdu.touch_hidden_app(device_id, x, y)
         if print_command:
-            print(f"Executing command: {cmd}")
-        
-        result = subprocess.run(cmd, shell=True, capture_output=True, text=True)
+            print(f"Executing command: {command}")
 
         return result
     
@@ -279,43 +302,33 @@ def act_on_device(frontend_action, device_id, wm_size, print_command = False, re
         assert "duration" in frontend_action, "Missing duration in LONGPRESS action"
         x, y = _convert_point_to_realworld_point(frontend_action["point"], wm_size)
         duration = frontend_action["duration"]
-        cmd = f"adb -s {device_id} shell app_process -Djava.class.path=/data/local/tmp/yadb /data/local/tmp com.ysbing.yadb.Main -touch {x} {y} {int(duration * 1000)}"
 
+        command = vdu.scroll_hidden_app(device_id, x, y, x, y, 1, int(duration * 1000))
         if print_command:
-            print(f"Executing command: {cmd}")
-        result = subprocess.run(cmd, shell=True, capture_output=True, text=True)
-
+            print(f"Executing command: {command}")
         return result
 
-    # adb shell app_process -Djava.class.path=/data/local/tmp/yadb /data/local/tmp com.ysbing.yadb.Main -keyboard "{text}"
     elif action_type == "TYPE":
         assert "value" in frontend_action, "Missing value in TYPE action"
-
         value = frontend_action["value"]
         keyboard_exists = frontend_action.get("keyboard_exists", True)
         if not keyboard_exists:
             if "point" in frontend_action:
                 x, y = _convert_point_to_realworld_point(frontend_action["point"], wm_size)
-                cmd = f"adb -s {device_id} shell input tap {x} {y}"
+                command = vdu.touch_hidden_app(device_id, x, y)
                 if print_command:
-                    print(f"Executing command: {cmd}")
-                result = subprocess.run(cmd, shell=True, capture_output=True, text=True)
+                    print(f"Executing command: {command}")
                 time.sleep(1)
             else:
                 print("Warning: keyboard does not exist and point is not given. Using current focus box.")
-
         def preprocess_text_for_adb(text):
             # Escape special characters for adb shell input
             text = text.replace("\n", " ").replace("\t", " ")
             text = text.replace(" ", "\\ ")
             return text
-
-
-        cmd = f"adb -s {device_id} shell app_process -Djava.class.path=/data/local/tmp/yadb /data/local/tmp com.ysbing.yadb.Main -keyboard '{preprocess_text_for_adb(value)}'"
+        command = vdu.text_hidden_app(device_id, preprocess_text_for_adb(value))
         if print_command:
-            print(f"Executing command: {cmd}")
-
-        result = subprocess.run(cmd, shell=True, capture_output=True, text=True)
+            print(f"Executing command: {command}")
         return result
     
     elif action_type == "SCROLL":
@@ -341,35 +354,21 @@ def act_on_device(frontend_action, device_id, wm_size, print_command = False, re
             x2, y2 = x + deltax, y
         else:
             raise ValueError(f"Invalid direction: {direction}")
-        
-        cmd = f"adb -s {device_id} shell input swipe {x1} {y1} {x2} {y2} 1200"
+        command = vdu.scroll_hidden_app(device_id, x1, y1, x2, y2, 1, 1200)
         if print_command:
-            print(f"Executing command: {cmd}")
-
-        result = subprocess.run(cmd, shell=True, capture_output=True, text=True)
+            print(f"Executing command: {command}")
 
         return result
-        
+
     elif action_type == "AWAKE":
+        # find package name
         assert "value" in frontend_action, "Missing value in AWAKE action"
         app_name = frontend_action["value"]
         package_name = find_package_name(app_name)
         if package_name is None:
             raise ValueError(f"App name {app_name} not found in package map.")
-        
-        if reflush_app:
-            cmd = f"adb -s {device_id} shell am force-stop {package_name}"
-            if print_command:
-                print(f"Executing command: {cmd}")
-
-            result = subprocess.run(cmd, shell=True, capture_output=True, text=True)
-            time.sleep(1)
-
-        cmd = f"adb -s {device_id} shell monkey -p {package_name} -c android.intent.category.LAUNCHER 1"
-        if print_command:
-            print(f"Executing command: {cmd}")
-
-        result = subprocess.run(cmd, shell=True, capture_output=True, text=True)
+        activity_name = find_LAUNCH_SINGLE_TOP_activity(device_id, package_name)
+        _awake_activity(device_id, package_name, activity_name, print_command)
 
         return result
 
@@ -378,34 +377,27 @@ def act_on_device(frontend_action, device_id, wm_size, print_command = False, re
         assert "point2" in frontend_action, "Missing point2 in SLIDE action"
         x1, y1 = _convert_point_to_realworld_point(frontend_action["point1"], wm_size)
         x2, y2 = _convert_point_to_realworld_point(frontend_action["point2"], wm_size)
-        
         duration = frontend_action.get("duration", 1.5)
-        cmd = f"adb -s {device_id} shell input swipe {x1} {y1} {x2} {y2} {int(duration * 1000)}"
+        command = vdu.scroll_hidden_app(device_id, x1, y1, x2, y2, 1, int(duration * 1000))
         if print_command:
-            print(f"Executing command: {cmd}")
-
-        result = subprocess.run(cmd, shell=True, capture_output=True, text=True)
+            print(f"Executing command: {command}")
 
         return result
     
     elif action_type == "BACK":
-        cmd = f"adb -s {device_id} shell input keyevent 4"
+        command = vdu.send_back_key(device_id)
         if print_command:
-            print(f"Executing command: {cmd}")
-
-        result = subprocess.run(cmd, shell=True, capture_output=True, text=True)
+            print(f"Executing command: {command}")
 
         return result
-    
+
     elif action_type == "HOME":
-        cmd = f"adb -s {device_id} shell input keyevent 3"
+        command = vdu.send_home_key(device_id)
         if print_command:
-            print(f"Executing command: {cmd}")
-
-        result = subprocess.run(cmd, shell=True, capture_output=True, text=True)
+            print(f"Executing command: {command}")
 
         return result
-    
+
     elif action_type == "COMPLETE":
         if print_command:
             print("Task completed.")
@@ -443,12 +435,21 @@ def act_on_device(frontend_action, device_id, wm_size, print_command = False, re
         if key.lower() not in key_event_map:
             raise ValueError(f"Unsupported hot key: {key}")
 
-        key_event = key_event_map[key.lower()]
-        cmd = f"adb -s {device_id} shell input keyevent {key_event}"
-        if print_command:
-            print(f"Executing command: {cmd}")
+        if key.lower() == "home":
+            command = vdu.send_home_key(device_id)
+            if print_command:
+                print(f"Executing command: {command}")
+        elif key.lower() == "back":
+            command = vdu.send_back_key(device_id)
+            if print_command:
+                print(f"Executing command: {command}")
+        else:
+            key_event = key_event_map[key.lower()]
+            cmd = f"adb -s {device_id} shell input keyevent {key_event}"
+            if print_command:
+                print(f"Executing command: {cmd}")
 
-        result = subprocess.run(cmd, shell=True, capture_output=True, text=True)
+            result = subprocess.run(cmd, shell=True, capture_output=True, text=True)
 
         return result
 

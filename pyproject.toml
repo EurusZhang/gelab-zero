@@ -20,5 +20,6 @@ dependencies = [
     "tqdm",
     "requests",
     "fastmcp",
+    "pygetwindow>=0.0.9",
 ]
  

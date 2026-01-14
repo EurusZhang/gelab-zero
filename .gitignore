@@ -9,3 +9,4 @@ model_config.yaml
 
 ###################
 *.pyc
+scrcpy_recording

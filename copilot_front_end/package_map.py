@@ -303,7 +303,7 @@ def find_LAUNCH_SINGLE_TOP_activity(adb_id, package_name):
             if package_name in line and 'LAUNCH_SINGLE_TOP' in line:
                 # Look for cmp= pattern
                 # Pattern: cmp=package_name/activity_name
-                match = re.search(r'cmp=([^\s]+)', line)
+                match = re.search(r'cmp=([^\s]+)}', line)
                 if match:
                     cmp_value = match.group(1)
                     # The cmp value is in format: package_name/activity_name

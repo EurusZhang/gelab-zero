@@ -5,6 +5,7 @@ import time
 if "." not in sys.path:
     sys.path.append(".")
 import datetime
+import subprocess
 
 from copilot_agent_client.pu_client import evaluate_task_on_device
 from copilot_front_end.mobile_action_helper import list_devices, get_device_wm_size
@@ -79,7 +80,7 @@ if __name__ == "__main__":
     
     # task = ' '.join(sys.argv[1:])
 
-    task = "打开应用宝，下载并安装：大众点评，并打开它" # 大众点评，抖音，滴滴出行，腾讯视频，QQ音乐，高德地图
+    task = "打开淘宝，用手机验证码的方式登录我的账号，区号为中国大陆+86，注意不是+886，手机号为17717016819"
 
     # The device ID you want to use
     device_id = list_devices()[0]
@@ -89,7 +90,8 @@ if __name__ == "__main__":
         "device_wm_size": device_wm_size
     }
 
-   
+    # root device
+    subprocess.check_output(f"adb -s {device_id} root")
 
     tmp_rollout_config = local_model_config
     l2_server = LocalServer(tmp_server_config)
