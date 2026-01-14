@@ -1,8 +1,7 @@
 import sys
-import time
-import datetime
 from pathlib import Path
 import argparse
+from copilot_front_end.hidden_surface_control_utils import log_folder
 
 # Make imports work no matter where you run this script from.
 PROJECT_DIR = Path(__file__).resolve().parents[1]  # .../gelab-zero
@@ -10,16 +9,10 @@ if str(PROJECT_DIR) not in sys.path:
     sys.path.insert(0, str(PROJECT_DIR))
 
 tmp_server_config = {
-    "log_dir": str(PROJECT_DIR / "running_log/server_log/os-copilot-local-eval-logs/traces"),
-    "image_dir": str(PROJECT_DIR / "running_log/server_log/os-copilot-local-eval-logs/images"),
+    "log_dir": f"{log_folder}/traces",
+    "image_dir": f"{log_folder}/images",
     "debug": False
 }
-tmp_server_config = {
-    "log_dir": f"running_log/server_log/os-copilot-local-eval-logs/{datetime.datetime.now().strftime("%Y-%m-%d_%H-%M-%S-%f")}/traces",
-    "image_dir": f"running_log/server_log/os-copilot-local-eval-logs/{datetime.datetime.now().strftime("%Y-%m-%d_%H-%M-%S-%f")}/images",
-    "debug": False
-}
-
 
 local_model_config = {
     "task_type": "parser_0922_summary",

@@ -12,7 +12,7 @@ import time
 from tqdm import tqdm
 
 from megfile import smart_copy
-from copilot_front_end.hidden_surface_control_utils import vdu
+from copilot_front_end.hidden_surface_control_utils import vdu, log_folder
 
 def _get_adb_command(device_id=None):
     """
@@ -552,10 +552,7 @@ def _awake_activity(device_id=None, package_name=None, activity_name=None, print
         print(f"Executing command: {command}")
     time.sleep(3)
     # scrcpy virtual display
-    scrcpy_recording_folder = f"{os.getcwd()}//scrcpy_recording"
-    if not os.path.exists(scrcpy_recording_folder):
-        os.makedirs(scrcpy_recording_folder)
-    vdu.open_virtual_display(device_id, log_folder=scrcpy_recording_folder)
+    vdu.open_virtual_display(device_id, f"{os.getcwd()}//{log_folder}")
     time.sleep(3)
     # mirror virtual display to physical screen
     vdu.start_mirror_activity(device_id)

@@ -1,7 +1,9 @@
 import os
+import json
 import datetime
 import subprocess
 from uuid import uuid4
+from tools.ask_llm_v2 import ask_llm_anything
 
 def main():
     print("Hello from hellogelab-zero!")
@@ -39,4 +41,37 @@ if __name__ == "__main__":
     # else:
     #     print(f"Fail to get screenshot name: {result.stderr}")
 
-    print(os.getcwd())
+    # print(os.getcwd())
+
+
+    # messages_to_ask = [
+    #     {
+    #         "role": "user",
+    #         "content": [
+    #             {
+    #                 "type": "text",
+    #                 "text": "Who are you?"
+    #             },
+    #             # {
+    #             #     'type': "image_url",
+    #             #     'image_url': {
+    #             #         'url': current_image_url
+    #             #     }
+    #             # },
+    #         ]
+    #     }
+    # ]
+    # response = ask_llm_anything(
+    #     model_provider="vllm",
+    #     model_name="gelab-zero-4b-preview",
+    #     messages=messages_to_ask,
+    #     args={
+    #         "max_tokens": 1024,
+    #         "temperature": 0.5,
+    #         "top_p": 1.0,
+    #         "frequency_penalty": 0.0,
+    #     }
+    # )
+    # print(response)
+
+

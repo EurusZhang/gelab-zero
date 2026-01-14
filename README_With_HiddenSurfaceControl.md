@@ -1,3 +1,13 @@
 # Attentions
+- For now, it is available for Kaanapali 1.0 META and device can be rooted
 - Install ADBKeyboard by `adb install` and reboot to take effective
 - Add scrcpy.exe path without any quotes into PC "System variables" as "SCRCPY_PATH"
+- When virtual display is mirrored to physical screen, DO NOT try to click HOME or BACK or MULTI-TASK BUTTON in case of unexpected virtual display service exit, which is a known issue of HiddenSurfaceControl apk for now
+- Taobao
+  - Successful to slide and choose country code
+  - Successful to type (actually paste) phone number
+  - Fail to slide the slider to verify
+  - Fail to type (actually paste) verification code
+- Jingdong
+  - Need face recognization to log in
+  - It keeps clicking phone number input box because no keyboard shows out so it thinks that it's not able to type

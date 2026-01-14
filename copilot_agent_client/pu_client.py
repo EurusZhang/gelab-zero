@@ -91,20 +91,6 @@ def evaluate_task_on_device(agent_server, device_info, task, rollout_config, ext
     Evaluate a task on a device using the provided frontend action converter and action function.
 
     """
-
-    # init device for the first time
-    device_id = device_info['device_id']
-    open_screen(device_id)
-    init_device(device_id)
-
-    # firstly start hidden surface control from Setting view to Home view
-    print("Init hidden surface control screen")
-    _awake_activity(device_id, "com.android.settings", "com.android.settings/com.android.settings.homepage.SettingsHomepageActivity", True)
-    press_home_key(device_id, print_command=True)
-
-    if reset_environment:
-        press_home_key(device_id, print_command=True)
-
     task, task_type = task, rollout_config['task_type']
 
     session_id = agent_server.get_session({
@@ -131,6 +117,19 @@ def evaluate_task_on_device(agent_server, device_info, task, rollout_config, ext
     delay_after_capture = rollout_config.get('delay_after_capture', 2)
 
     history_actions = []
+
+    # init device for the first time
+    device_id = device_info['device_id']
+    open_screen(device_id)
+    init_device(device_id)
+
+    # firstly start hidden surface control from Setting view to Home view
+    print("Init hidden surface control screen")
+    _awake_activity(device_id, "com.android.settings", "com.android.settings/com.android.settings.homepage.SettingsHomepageActivity", True)
+    press_home_key(device_id, print_command=True)
+
+    if reset_environment:
+        press_home_key(device_id, print_command=True)
 
     for step_idx in range(max_steps):
 

@@ -15,6 +15,7 @@ import shutil
 import pygetwindow as gw
 import win32gui
 import win32con
+import datetime
 from dotenv import load_dotenv
 from time import sleep
 
@@ -161,6 +162,7 @@ class VirtualDisplayUtils:
             return
 
 vdu = VirtualDisplayUtils()
+log_folder = f"running_log/server_log/os-copilot-local-eval-logs/{datetime.datetime.now().strftime("%Y-%m-%d_%H-%M-%S-%f")}"
 
 if __name__ == "__main__":
     adb_id="9deb5ba5"

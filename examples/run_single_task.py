@@ -1,19 +1,18 @@
 
-import os
 import sys
 import time
 if "." not in sys.path:
     sys.path.append(".")
-import datetime
 import subprocess
 
 from copilot_agent_client.pu_client import evaluate_task_on_device
 from copilot_front_end.mobile_action_helper import list_devices, get_device_wm_size
 from copilot_agent_server.local_server import LocalServer
+from copilot_front_end.hidden_surface_control_utils import log_folder
 
 tmp_server_config = {
-    "log_dir": f"running_log/server_log/os-copilot-local-eval-logs/{datetime.datetime.now().strftime("%Y-%m-%d_%H-%M-%S-%f")}/traces",
-    "image_dir": f"running_log/server_log/os-copilot-local-eval-logs/{datetime.datetime.now().strftime("%Y-%m-%d_%H-%M-%S-%f")}/images",
+    "log_dir": f"{log_folder}/traces",
+    "image_dir": f"{log_folder}/images",
     "debug": False
 }
 
@@ -80,7 +79,7 @@ if __name__ == "__main__":
     
     # task = ' '.join(sys.argv[1:])
 
-    task = "打开淘宝，用手机验证码的方式登录我的账号，区号为中国大陆+86，注意不是+886，手机号为17717016819"
+    task = "登录我的淘宝账号。选择手机验证码的方式登录，在手机区号选择里划动选择中国大陆+86，然后输入手机号17717016819，再等待用户输入验证码，再登录。"
 
     # The device ID you want to use
     device_id = list_devices()[0]
@@ -102,14 +101,15 @@ if __name__ == "__main__":
     total_start = time.time()
     # Disable auto reply
     evaluate_task_on_device(l2_server, device_info, task, tmp_rollout_config, reflush_app=True)
+    # Enable auto reply
+    # evaluate_task_on_device(l2_server, device_info, task, tmp_rollout_config, reflush_app=True, auto_reply=True)
     total_time = time.time() - total_start
 
     # 在最后加一行总时间
     print(f"总计执行时间为 {total_time} 秒")
     
     pass
-    # Enable auto reply
-    # evaluate_task_on_device(l2_server, device_info, task, tmp_rollout_config, reflush_app=True, auto_reply=True)
+
 
 
 
