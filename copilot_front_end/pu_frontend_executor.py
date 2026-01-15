@@ -14,7 +14,7 @@ sys.path.append(os.path.dirname(os.path.abspath(__file__)))
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
 from copilot_front_end.package_map import find_package_name, find_LAUNCH_SINGLE_TOP_activity
-from copilot_front_end.hidden_surface_control_utils import vdu, log_folder
+from copilot_front_end.hidden_surface_control_utils import vdu, log_folder, mirror_display_switch
 
 def parser0729_to_frontend_action(parser_action):
     pass
@@ -243,8 +243,9 @@ def _awake_activity(device_id=None, package_name=None, activity_name=None, print
     vdu.open_virtual_display(device_id, f"{os.getcwd()}//{log_folder}")
     time.sleep(3)
     # mirror virtual display to physical screen
-    vdu.start_mirror_activity(device_id)
-    time.sleep(3)
+    if mirror_display_switch:
+        vdu.start_mirror_activity(device_id)
+        time.sleep(3)
 
 def act_on_device(frontend_action, device_id, wm_size, print_command = False, reflush_app = True):
     """

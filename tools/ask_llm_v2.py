@@ -18,9 +18,9 @@ def ask_llm_anything(model_provider, model_name, messages, args= {
     "frequency_penalty": 0.0,
 }, resize_config=None):
 
-    with smart_open("model_config.yaml", "r") as f:
-        model_config = yaml.safe_load(f)
-    
+    with smart_open("config.yaml", "r", encoding="utf-8") as f:
+        config = yaml.safe_load(f)
+    model_config = config["model_config"]
 
     if model_provider in model_config:
         openai.api_base = model_config[model_provider]["api_base"]

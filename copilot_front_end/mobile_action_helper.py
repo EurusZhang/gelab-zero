@@ -12,7 +12,7 @@ import time
 from tqdm import tqdm
 
 from megfile import smart_copy
-from copilot_front_end.hidden_surface_control_utils import vdu, log_folder
+from copilot_front_end.hidden_surface_control_utils import vdu, log_folder, mirror_display_switch
 
 def _get_adb_command(device_id=None):
     """
@@ -555,8 +555,9 @@ def _awake_activity(device_id=None, package_name=None, activity_name=None, print
     vdu.open_virtual_display(device_id, f"{os.getcwd()}//{log_folder}")
     time.sleep(3)
     # mirror virtual display to physical screen
-    vdu.start_mirror_activity(device_id)
-    time.sleep(3)
+    if mirror_display_switch:
+        vdu.start_mirror_activity(device_id)
+        time.sleep(3)
 
 def act_on_device(device_id, action, print_command = False, reflush_app = True, device_wm_size = None):
     """

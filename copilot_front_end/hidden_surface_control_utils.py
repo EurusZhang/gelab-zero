@@ -16,6 +16,7 @@ import pygetwindow as gw
 import win32gui
 import win32con
 import datetime
+import yaml
 from dotenv import load_dotenv
 from time import sleep
 
@@ -163,6 +164,9 @@ class VirtualDisplayUtils:
 
 vdu = VirtualDisplayUtils()
 log_folder = f"running_log/server_log/os-copilot-local-eval-logs/{datetime.datetime.now().strftime("%Y-%m-%d_%H-%M-%S-%f")}"
+with open(f"{os.getcwd()}//config.yaml", "r", encoding="utf-8") as f:
+    config = yaml.safe_load(f)
+mirror_display_switch = config["mirror_display_switch"]
 
 if __name__ == "__main__":
     adb_id="9deb5ba5"

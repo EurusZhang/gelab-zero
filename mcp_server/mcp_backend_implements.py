@@ -1,5 +1,6 @@
 from fastmcp import FastMCP
 
+import os
 import sys
 if "." not in sys.path:
     sys.path.append(".")
@@ -180,7 +181,10 @@ def execute_task(
 
 
     # load mcp server config
-    mcp_server_config = yaml.safe_load(smart_open("mcp_server_config.yaml", "r"))
+    # mcp_server_config = yaml.safe_load(smart_open("mcp_server_config.yaml", "r"))
+    with open(f"{os.getcwd()}//config.yaml", "r", encoding="utf-8") as f:
+        config = yaml.safe_load(f)
+    mcp_server_config = config["mcp_server_config"]
     agent_loop_config = mcp_server_config['agent_loop_config']
 
     # determine the actual max_steps

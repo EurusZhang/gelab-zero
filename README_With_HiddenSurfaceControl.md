@@ -1,4 +1,4 @@
-# Attentions
+# Setup
 - Install HiddenSurfaceControl APK
   - `adb root`
   - `adb remount`
@@ -6,6 +6,9 @@
   - `adb reboot`
   - Add scrcpy.exe path without any quotes into PC "System variables" as "SCRCPY_PATH"
 - Install ADBKeyboard by `adb install` and reboot to take effective
+
+# Attentions
+- If set "mirror_display_switch" as False, DO NOT open same app on physical display while that app is running on virtual display. Otherwise it will disrupt agent workflow on virtual display because same app will toggle back and forth between physical and virtual displays
 
 # Known Issues
 - For now, it is only available for Kaanapali 1.0 META and device can be rooted. Kaanapali 2.0 can be available in the future.
@@ -21,7 +24,10 @@
 
 # TODO
 - [X] Formatted trace jsonl file
+- [X] Support config.yaml file
+  - [X] system prompts
+  - [X] model_config.yaml info
+  - [X] mirror display switch
 - [ ] Export to .exe
-  - [ ] with configurable paras .yaml file like system prompts, scrcpy path, model_config.yaml info .etc
   - [ ] support GUI with double clicks or running in console witout paras input
   - [ ] support running in console with task para input

@@ -1,5 +1,6 @@
 from fastmcp import FastMCP
 
+import os
 import sys
 if "." not in sys.path:
     sys.path.append(".")
@@ -162,7 +163,10 @@ Returns:
     return return_log
 
 
-with open("mcp_server_config.yaml", "r") as f:
-    mcp_server_config = yaml.safe_load(f)
+# with open("mcp_server_config.yaml", "r") as f:
+#     mcp_server_config = yaml.safe_load(f)
+with open(f"{os.getcwd()}//config.yaml", "r", encoding="utf-8") as f:
+    config = yaml.safe_load(f)
+mcp_server_config = config["mcp_server_config"]
 
 mcp.run(transport="http", port=mcp_server_config['server_config'].get("mcp_server_port", 8702))
