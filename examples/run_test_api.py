@@ -1,13 +1,14 @@
 import sys
 from pathlib import Path
 import argparse
-from copilot_front_end.hidden_surface_control_utils import log_folder
+from copilot_front_end.hidden_surface_control_utils import vdu
 
 # Make imports work no matter where you run this script from.
 PROJECT_DIR = Path(__file__).resolve().parents[1]  # .../gelab-zero
 if str(PROJECT_DIR) not in sys.path:
     sys.path.insert(0, str(PROJECT_DIR))
 
+log_folder = vdu.update_log_folder()
 tmp_server_config = {
     "log_dir": f"{log_folder}/traces",
     "image_dir": f"{log_folder}/images",

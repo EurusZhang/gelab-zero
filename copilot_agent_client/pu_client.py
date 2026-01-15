@@ -162,9 +162,10 @@ def evaluate_task_on_device(agent_server, device_info, task, rollout_config, ext
                 print(f"info: {reply_info}")
             
             else:
-                print(f"EN: Agent asks: {history_actions[-1]['value']} Please Reply: ")
-                print(f"ZH: Agent 问你: {history_actions[-1]['value']} 回复一下：")
+                # print(f"EN: Agent asks: {history_actions[-1]['value']} Please Reply: ")
+                # print(f"ZH: Agent 问你: {history_actions[-1]['value']} 回复一下：")
 
+                print(f"Agent asks: {history_actions[-1]['value']} Please Reply!")
                 reply_info = input("Your reply:")
 
             print(f"Replied info action: {reply_info}")

@@ -8,12 +8,14 @@ import yaml
 from copilot_agent_client.pu_client import evaluate_task_on_device
 from copilot_front_end.mobile_action_helper import list_devices, get_device_wm_size
 from copilot_agent_server.local_server import LocalServer
-from copilot_front_end.hidden_surface_control_utils import log_folder
+from copilot_front_end.hidden_surface_control_utils import vdu
+
 
 config_file = f"{os.getcwd()}//config.yaml"
 with open(config_file, "r", encoding="utf-8") as f:
     config = yaml.safe_load(f)
 
+log_folder = vdu.update_log_folder()
 tmp_server_config = {
     "log_dir": f"{log_folder}/traces",
     "image_dir": f"{log_folder}/images",

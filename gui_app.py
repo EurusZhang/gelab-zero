@@ -16,7 +16,7 @@ if "." not in sys.path:
 from copilot_agent_client.pu_client import evaluate_task_on_device
 from copilot_front_end.mobile_action_helper import list_devices, get_device_wm_size
 from copilot_agent_server.local_server import LocalServer
-from copilot_front_end.hidden_surface_control_utils import log_folder
+from copilot_front_end.hidden_surface_control_utils import vdu
 import subprocess
 
 # Global stop flag
@@ -331,7 +331,10 @@ class GelabZeroGUI:
         try:
             self.log(f"Starting task: {task}")
             self.log("=" * 60)
-            
+
+            # Generate new log folder with current timestamp
+            log_folder = vdu.update_log_folder()
+
             # Get device info
             devices = list_devices()
             if not devices:

@@ -26,7 +26,11 @@ VIRTUAL_DISPLAY_NAME = "HiddenSurfaceControl"
 
 class VirtualDisplayUtils:
     def __init__(self):
-        pass
+        self.log_folder = ""
+
+    def update_log_folder(self):
+        self.log_folder = f"running_log/server_log/os-copilot-local-eval-logs/{datetime.datetime.now().strftime("%Y-%m-%d_%H-%M-%S-%f")}"
+        return self.log_folder
 
     def start_hidden_app(self, device_id=None, name=""):
         cmd = f"adb -s {device_id} shell am start-foreground-service -a qualcomm.intent.action.VIRTUAL_DISPLAY_APP_LAUNCH --es target_component \"{name}\""
@@ -163,11 +167,11 @@ class VirtualDisplayUtils:
             return
 
 vdu = VirtualDisplayUtils()
-log_folder = f"running_log/server_log/os-copilot-local-eval-logs/{datetime.datetime.now().strftime("%Y-%m-%d_%H-%M-%S-%f")}"
 
 config_file = f"{os.getcwd()}//config.yaml"
 with open(config_file, "r", encoding="utf-8") as f:
     config = yaml.safe_load(f)
+
 mirror_display_switch = config.get("mirror_display_switch", False)
 
 if __name__ == "__main__":
