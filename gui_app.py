@@ -79,10 +79,14 @@ class InputRedirector:
         return False
 
 class GelabZeroGUI:
-    def __init__(self, root):
+    def __init__(self, root, auto_start_task=None):
         self.root = root
         self.root.title("Gelab Zero Task Runner")
         self.root.geometry("1200x800")
+        
+        # Auto-start configuration
+        self.auto_start_task = auto_start_task
+        self.auto_close_on_completion = auto_start_task is not None
         
         # Config file path
         self.config_file = f"{os.getcwd()}//config.yaml"
@@ -107,6 +111,10 @@ class GelabZeroGUI:
         
         # Start log update loop
         self.update_logs()
+        
+        # Auto-start task if provided
+        if self.auto_start_task:
+            self.root.after(1000, self.auto_start)  # Start after 1 second to allow UI to initialize
     
     def load_config(self):
         """Load configuration from config.yaml file"""
@@ -131,7 +139,7 @@ class GelabZeroGUI:
         ttk.Label(top_frame, text="Task Prompt:", font=("Arial", 10, "bold")).pack(side=tk.LEFT, padx=5)
         self.task_entry = ttk.Entry(top_frame, width=60, font=("Arial", 10))
         self.task_entry.pack(side=tk.LEFT, padx=5, fill=tk.X, expand=True)
-        self.task_entry.insert(0, "打开淘宝，搜索苹果手机，加入购物车")
+        self.task_entry.insert(0, "打开淘宝，搜索苹果手机，加入购物车。")
 
         # Buttons
         self.start_button = tk.Button(top_frame, text="Start", bg="#4CAF50", fg="white", 
@@ -424,96 +432,51 @@ class GelabZeroGUI:
             # Update UI
             self.root.after(0, self.task_finished)
     
+    def auto_start(self):
+        """Auto-start the task if provided"""
+        if self.auto_start_task:
+            # Set the task in the entry field
+            self.task_entry.delete(0, tk.END)
+            self.task_entry.insert(0, self.auto_start_task)
+            self.log(f"Auto-starting task: {self.auto_start_task}")
+            # Start the task
+            self.start_task()
+    
     def task_finished(self):
         """Called when task finishes"""
         self.is_running = False
         self.start_button.config(state=tk.NORMAL)
         self.stop_button.config(state=tk.DISABLED)
         self.log("Ready for next task.")
-
-def run_headless_task(task):
-    """Run task in headless mode without GUI"""
-    try:
-        print(f"[Headless Mode] Starting task: {task}")
         
-        # Get device info
-        devices = list_devices()
-        if not devices:
-            print("ERROR: No devices found! Please connect an Android device.")
-            return {"success": False, "error": "No devices found"}
-        
-        device_id = devices[0]
-        print(f"[Headless Mode] Using device: {device_id}")
-        
-        device_wm_size = get_device_wm_size(device_id)
-        device_info = {
-            "device_id": device_id,
-            "device_wm_size": device_wm_size
-        }
-        
-        # Root device
-        try:
-            subprocess.check_output(f"adb -s {device_id} root", shell=True,
-                                  creationflags=subprocess.CREATE_NO_WINDOW)
-            print("[Headless Mode] Device rooted successfully")
-        except Exception as e:
-            print(f"[Headless Mode] Warning: Failed to root device: {e}")
-
-        # Setup server config
-        tmp_server_config = {
-            "log_dir": f"{log_folder}/traces",
-            "image_dir": f"{log_folder}/images",
-            "debug": False
-        }
-
-        # Load config.yaml
-        config_file = f"{os.getcwd()}//config.yaml"
-        if os.path.exists(config_file):
-            with open(config_file, 'r', encoding='utf-8') as f:
-                config = yaml.safe_load(f)
-        else:
-            print("[Headless Mode] No config.yaml")
-
-        # Setup rollout config
-        tmp_rollout_config = config["rollout_config"]
-        tmp_rollout_config["task_type"] = "parser_0922_summary"
-
-        # Create server
-        l2_server = LocalServer(tmp_server_config)
-        
-        # Execute task
-        start_time = time.time()
-        
-        result = evaluate_task_on_device(
-            l2_server, device_info, task, tmp_rollout_config, 
-            reflush_app=True, auto_reply=False
-        )
-        
-        total_time = time.time() - start_time
-        
-        print(f"[Headless Mode] Task completed in {total_time:.2f} seconds")
-        print(f"[Headless Mode] Stop reason: {result.get('stop_reason', 'UNKNOWN')}")
-        print(f"[Headless Mode] Total steps: {result.get('stop_steps', 0)}")
-        
-        return {
-            "success": True,
-            "result": result,
-            "total_time": total_time
-        }
-        
-    except Exception as e:
-        print(f"[Headless Mode] ERROR: {str(e)}")
-        import traceback
-        traceback.print_exc()
-        return {"success": False, "error": str(e)}
+        # Auto-close if this was an auto-started task
+        if self.auto_close_on_completion:
+            self.log("Task completed. Auto-closing in 3 seconds...")
+            self.root.after(3000, self.auto_close)  # Close after 3 seconds
+    
+    def auto_close(self):
+        """Auto-close the application"""
+        self.log("Auto-closing application...")
+        self.root.quit()
+        self.root.destroy()
 
 def main():
     # Check if task is provided as command-line argument
     if len(sys.argv) > 1:
-        # Headless mode - run task from command line
-        task = sys.argv[1]
-        result = run_headless_task(task)
-        sys.exit(0 if result.get("success") else 1)
+        # Check for GUI mode with auto-start
+        if len(sys.argv) > 2 and sys.argv[2] == "--gui-auto":
+            # GUI mode with auto-start
+            task = sys.argv[1]
+            root = tk.Tk()
+            app = GelabZeroGUI(root, auto_start_task=task)
+            root.mainloop()
+        else:
+            # Invalid usage - only support GUI modes
+            print("Error: Only GUI modes are supported.")
+            print("Usage:")
+            print("  python gui_app.py                    # GUI mode")
+            print("  python gui_app.py <task> --gui-auto  # GUI auto-start mode")
+            sys.exit(1)
     else:
         # GUI mode
         root = tk.Tk()
