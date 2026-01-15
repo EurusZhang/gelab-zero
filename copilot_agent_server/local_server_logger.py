@@ -1,3 +1,4 @@
+import os
 import json
 import jsonlines
 
@@ -70,9 +71,18 @@ class LocalServerLogger(BaseLogger):
         with smart_open(self.log_target_file, 'a',encoding='utf-8') as f:
             writer = jsonlines.Writer(f)
             writer.write(log_message)
-        
+
         if is_print:
             print(json.dumps(log_message, indent=2, ensure_ascii=False))
+
+        # Update jsonl file to another json file with correct line break format
+        data_list = []
+        with open(self.log_target_file, 'r', encoding='utf-8') as f:
+            for line in f:
+                if line.strip():
+                    data_list.append(json.loads(line))
+        with open(self.log_target_file.replace(".jsonl", "_formatted.json"), 'w', encoding='utf-8') as f:
+            json.dump(data_list, f, ensure_ascii=False, indent=2)
 
     def save_image(self, image: Image.Image, image_name: str) -> str:
         """

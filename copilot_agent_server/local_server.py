@@ -176,6 +176,21 @@ class LocalServer(BaseCopilotServer):
 
         
         llm_start_time = time.time()
+
+        # # No need for this, because there is trace folder already
+        # # Save messages locally before transferred to model
+        # file_path = f"{os.getcwd()}//{log_folder}/messages.json"
+        # try:
+        #     with open(file_path, 'r', encoding='utf-8') as f:
+        #         all_messages = json.load(f)
+        #         if not isinstance(all_messages, list):
+        #             all_messages = [all_messages]
+        # except (FileNotFoundError, json.JSONDecodeError):
+        #     all_messages = []
+        # all_messages.append(messages_to_ask)
+        # with open(file_path, 'w', encoding='utf-8') as f:
+        #     json.dump(all_messages, f, ensure_ascii=False, indent=2)
+
         response = ask_llm_anything(
             model_provider=model_provider,
             model_name=model_name,

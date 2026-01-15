@@ -76,10 +76,10 @@ if __name__ == "__main__":
     #     print("   示例1：python script.py \"去淘宝帮我买本书\"")
     #     print("   示例2：python script.py \"打开微信，给柏茗发helloworld\"")
     #     sys.exit(1)  
-    
     # task = ' '.join(sys.argv[1:])
 
-    task = "登录我的淘宝账号。选择手机验证码的方式登录，在手机区号选择里划动选择中国大陆+86，然后输入手机号17717016819，再等待用户输入验证码，再登录。"
+    # task = "登录我的抖音账号。选择手机验证码的方式登录，在手机区号选择里划动选择中国大陆+86，然后输入手机号17717016819，再等待用户输入验证码，再登录。"
+    task = "打开淘宝，搜索苹果手机iphone14，并选择256g，加入购物车"
 
     # The device ID you want to use
     device_id = list_devices()[0]
@@ -107,10 +107,3 @@ if __name__ == "__main__":
 
     # 在最后加一行总时间
     print(f"总计执行时间为 {total_time} 秒")
-    
-    pass
-
-
-
-
-    pass
