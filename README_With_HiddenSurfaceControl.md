@@ -5,8 +5,12 @@
   - `adb push HiddenSurfaceControl.apk /vendor/app`
   - `adb reboot`
   - Add scrcpy.exe path without any quotes into PC "System variables" as "SCRCPY_PATH"
-- Install ADBKeyboard by `adb install` and reboot to take effective
 - Add ADB tool path into path system variable
+- How to enable typing on device
+  - `adb push yadb /data/local/tmp/`
+  - `adb install -r ADBKeyboard.apk`
+  - Enable adbkeyboard in device Setting
+  - `adb reboot`
 - Run `pyinstaller gelab_zero.spec` to export .exe
 
 # Attentions
@@ -32,4 +36,4 @@
   - [X] mirror display switch
 - [X] Export to .exe
   - [X] support GUI with double clicks
-  - [ ] support running in console with task para input
+  - [X] support running in console with task para input
