@@ -111,7 +111,7 @@ class GelabZeroGUI:
         ttk.Label(top_frame, text="Task Prompt:", font=("Arial", 10, "bold")).pack(side=tk.LEFT, padx=5)
         self.task_entry = ttk.Entry(top_frame, width=60, font=("Arial", 10))
         self.task_entry.pack(side=tk.LEFT, padx=5, fill=tk.X, expand=True)
-        self.task_entry.insert(0, "打开淘宝，搜索苹果手机，等待用户选择手机颜色，并选择256g，加入购物车")
+        self.task_entry.insert(0, "打开淘宝，搜索苹果手机，加入购物车")
 
         # Buttons
         self.start_button = tk.Button(top_frame, text="Start", bg="#4CAF50", fg="white", 
@@ -218,14 +218,31 @@ class GelabZeroGUI:
                 return  # Allow copy
             return "break"  # Block all other keys
         
-        # When waiting for input, only allow typing at the end
-        # Block backspace/delete if trying to delete existing content
+        # When waiting for input, restrict editing to only the input line
+        current_pos = self.log_text.index(tk.INSERT)
+        
+        # For navigation keys, restrict cursor movement
+        if event.keysym in ('Left', 'Right', 'Up', 'Down', 'Home', 'End', 'Prior', 'Next'):
+            # For Left arrow and Home, don't allow moving before input start
+            if event.keysym in ('Left', 'Home', 'Up', 'Prior'):
+                if self.log_text.compare(current_pos, "<=", self.input_start_pos):
+                    return "break"  # Block movement before input start
+            return None  # Allow other navigation
+        
+        # For backspace/delete operations
         if event.keysym in ('BackSpace', 'Delete'):
-            current_pos = self.log_text.index(tk.INSERT)
+            # Block deletion if cursor is at or before input start position
             if self.log_text.compare(current_pos, "<=", self.input_start_pos):
                 return "break"  # Block deletion of existing content
         
-        # Allow normal typing at the end
+        # For typing and other keys
+        else:
+            # Only allow operations if cursor is at or after input start position
+            if self.log_text.compare(current_pos, "<", self.input_start_pos):
+                # Move cursor to input start position
+                self.log_text.mark_set(tk.INSERT, self.input_start_pos)
+        
+        # Allow the key press
         return None
     
     def on_enter_key(self, event):
