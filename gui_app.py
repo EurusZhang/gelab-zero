@@ -57,6 +57,26 @@ class InputRedirector:
     def read(self, size=-1):
         """Read input (delegates to readline)"""
         return self.readline()
+    
+    def write(self, string):
+        """Dummy write method for compatibility"""
+        pass
+    
+    def flush(self):
+        """Dummy flush method for compatibility"""
+        pass
+    
+    def isatty(self):
+        """Return True to indicate this is a terminal-like interface"""
+        return True
+    
+    def readable(self):
+        """Return True to indicate this stream is readable"""
+        return True
+    
+    def writable(self):
+        """Return False to indicate this stream is not writable"""
+        return False
 
 class GelabZeroGUI:
     def __init__(self, root):
@@ -321,7 +341,8 @@ class GelabZeroGUI:
             
             # Root device
             try:
-                subprocess.check_output(f"adb -s {device_id} root", shell=True)
+                subprocess.check_output(f"adb -s {device_id} root", shell=True, 
+                                      creationflags=subprocess.CREATE_NO_WINDOW)
                 self.log("Device rooted successfully")
             except Exception as e:
                 self.log(f"Warning: Failed to root device: {e}")
@@ -360,10 +381,15 @@ class GelabZeroGUI:
             # Execute task
             start_time = time.time()
             
-            # Redirect stdout and stdin
+            # Redirect stdout, stderr and stdin
             old_stdout = sys.stdout
+            old_stderr = sys.stderr
             old_stdin = sys.stdin
-            sys.stdout = TextRedirector(self.log_text, self.log_queue)
+            
+            # Create redirectors
+            text_redirector = TextRedirector(self.log_text, self.log_queue)
+            sys.stdout = text_redirector
+            sys.stderr = text_redirector  # Also redirect stderr to prevent "lost sys.stderr" error
             
             # Create input redirector
             self.input_redirector = InputRedirector(self.log_text, self.log_queue)
@@ -383,7 +409,9 @@ class GelabZeroGUI:
                 self.log(f"Total steps: {result.get('stop_steps', 0)}")
                 
             finally:
+                # Restore original streams
                 sys.stdout = old_stdout
+                sys.stderr = old_stderr
                 sys.stdin = old_stdin
                 self.input_redirector = None
             
@@ -425,7 +453,8 @@ def run_headless_task(task):
         
         # Root device
         try:
-            subprocess.check_output(f"adb -s {device_id} root", shell=True)
+            subprocess.check_output(f"adb -s {device_id} root", shell=True,
+                                  creationflags=subprocess.CREATE_NO_WINDOW)
             print("[Headless Mode] Device rooted successfully")
         except Exception as e:
             print(f"[Headless Mode] Warning: Failed to root device: {e}")

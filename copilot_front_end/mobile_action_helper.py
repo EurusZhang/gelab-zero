@@ -62,7 +62,7 @@ def close_app_on_device(device_id, app_name, print_command = False):
     if print_command:
         print(f"Executing command: {command}")
     
-    subprocess.run(command, shell=True, capture_output=True, text=True)
+    subprocess.run(command, shell=True, capture_output=True, text=True, creationflags=subprocess.CREATE_NO_WINDOW)
 
 def press_home_key(device_id, print_command = False):
     """
@@ -85,7 +85,7 @@ def init_device(device_id, print_command = False):
     if print_command:
         print(f"Executing command: {command}")
     
-    result = subprocess.run(command, shell=True, capture_output=True, text=True)
+    result = subprocess.run(command, shell=True, capture_output=True, text=True, creationflags=subprocess.CREATE_NO_WINDOW)
     if "29a0cd3b3adea92350dd5a25594593df" not in result.stdout:
         # to push yadb into the device
         command = f"{adb_command} push yadb /data/local/tmp"
@@ -95,7 +95,7 @@ def init_device(device_id, print_command = False):
             # print(f"Executing command: {command}")
             print(f"Executing command: {command}")
 
-        subprocess.run(command, shell=True, capture_output=True, text=True)
+        subprocess.run(command, shell=True, capture_output=True, text=True, creationflags=subprocess.CREATE_NO_WINDOW)
     else:
         print("yadb is already installed on the device.")
 
@@ -132,14 +132,14 @@ def dectect_screen_on(device_id, print_command = False):
         command = f"{adb_command} shell dumpsys display"
         if print_command:
             print(f"Executing command: {command}")
-        result = subprocess.run(command, shell=True, capture_output=True, text=True)
+        result = subprocess.run(command, shell=True, capture_output=True, text=True, creationflags=subprocess.CREATE_NO_WINDOW)
         result.stdout = result.stdout.encode('utf-8').decode('utf-8')
         screen_state = local_str_grep(result.stdout, "mScreenState").strip()
     else:
         command = f"{adb_command} shell dumpsys display | grep mScreenState"
         if print_command:
             print(f"Executing command: {command}")
-        result = subprocess.run(command, shell=True, capture_output=True, text=True)
+        result = subprocess.run(command, shell=True, capture_output=True, text=True, creationflags=subprocess.CREATE_NO_WINDOW)
         screen_state = result.stdout.strip()
     
     if "ON" in screen_state:
@@ -157,7 +157,7 @@ def press_power_key(device_id, print_command = False):
     if print_command:
         print(f"Executing command: {command}")
     
-    subprocess.run(command, shell=True, capture_output=True, text=True)
+    subprocess.run(command, shell=True, capture_output=True, text=True, creationflags=subprocess.CREATE_NO_WINDOW)
 
 def swipe_up_to_unlock(device_id, wm_size=(1000,2000), print_command = False):
     """
@@ -172,7 +172,7 @@ def swipe_up_to_unlock(device_id, wm_size=(1000,2000), print_command = False):
     command = f"{adb_command} shell input swipe {x} {y_start} {x} {y_end}"
     if print_command:
         print(f"Executing command: {command}")
-    subprocess.run(command, shell=True, capture_output=True, text=True)
+    subprocess.run(command, shell=True, capture_output=True, text=True, creationflags=subprocess.CREATE_NO_WINDOW)
 
 def get_manufacturer(device_id):
     """
@@ -180,7 +180,7 @@ def get_manufacturer(device_id):
     """
     adb_command = _get_adb_command(device_id)
     command = f"{adb_command} shell getprop ro.product.manufacturer"
-    result = subprocess.run(command, shell=True, capture_output=True, text=True)
+    result = subprocess.run(command, shell=True, capture_output=True, text=True, creationflags=subprocess.CREATE_NO_WINDOW)
     manufacturer = result.stdout.strip().lower()
     return manufacturer
 
@@ -216,7 +216,7 @@ def list_devices():
     List all connected mobile devices.
     """
     try:
-        result = subprocess.run(['adb', 'devices'], capture_output=True, text=True)
+        result = subprocess.run(['adb', 'devices'], capture_output=True, text=True, creationflags=subprocess.CREATE_NO_WINDOW)
         devices = result.stdout.splitlines()[1:]
         devices = [line.split()[0].strip() for line in devices if line.strip() and 'device' in line]
         return devices
@@ -244,7 +244,7 @@ def _capture_save_screenshot(device_id, tmp_file_dir="tmp_screenshot", image_nam
         command = f"{adb_command} shell rm -rf {screenshot_folder}"
         if print_command:
             print(f"Executing command: {command}")
-        subprocess.run(command, shell=True, capture_output=True, text=True)
+        subprocess.run(command, shell=True, capture_output=True, text=True, creationflags=subprocess.CREATE_NO_WINDOW)
 
         # Take a screenshot
         command = vdu.take_screenshot(device_id)
@@ -256,7 +256,7 @@ def _capture_save_screenshot(device_id, tmp_file_dir="tmp_screenshot", image_nam
         command = f"adb shell ls {screenshot_folder}"
         if print_command:
             print(f"Executing command: {command}")
-        result = subprocess.run(command, shell=True, capture_output=True, text=True)
+        result = subprocess.run(command, shell=True, capture_output=True, text=True, creationflags=subprocess.CREATE_NO_WINDOW)
         if result.returncode == 0:
             files = result.stdout.strip().split('\n')
             old_name = files[0]
@@ -266,7 +266,7 @@ def _capture_save_screenshot(device_id, tmp_file_dir="tmp_screenshot", image_nam
             rename_command = f"{adb_command} shell mv {old_path} {new_path}"
             if print_command:
                 print(f"Executing command: {rename_command}")
-            rename_result = subprocess.run(rename_command, shell=True, capture_output=True, text=True)
+            rename_result = subprocess.run(rename_command, shell=True, capture_output=True, text=True, creationflags=subprocess.CREATE_NO_WINDOW)
             if rename_result.returncode == 0:
                 print(f"Success to rename screenshot: {old_name} -> {new_name}")
             else:
@@ -278,7 +278,7 @@ def _capture_save_screenshot(device_id, tmp_file_dir="tmp_screenshot", image_nam
         command = f"{adb_command} pull {new_path} {screen_shot_pic_path}"
         if print_command:
             print(f"Executing command: {command}")
-        subprocess.run(command, shell=True, capture_output=True, text=True)
+        subprocess.run(command, shell=True, capture_output=True, text=True, creationflags=subprocess.CREATE_NO_WINDOW)
 
         return screen_shot_pic_path
     except Exception as e:
@@ -308,7 +308,7 @@ def get_device_wm_size(device_id):
 
         # print(f"Getting device {device_id} wm size with command: {command}")
 
-        result = subprocess.run(command, shell=True, capture_output=True, text=True)
+        result = subprocess.run(command, shell=True, capture_output=True, text=True, creationflags=subprocess.CREATE_NO_WINDOW)
 
         result_str = result.stdout.strip()
         
@@ -542,7 +542,7 @@ def _awake_activity(device_id=None, package_name=None, activity_name=None, print
     command = f"{adb_command} shell am force-stop {package_name}"
     if print_command:
         print(f"Executing command: {command}")
-    subprocess.run(command, shell=True, capture_output=True, text=True)
+    subprocess.run(command, shell=True, capture_output=True, text=True, creationflags=subprocess.CREATE_NO_WINDOW)
     time.sleep(1)
     # firstly stop virtual display scrcpy
     vdu.taskkill_consoles()

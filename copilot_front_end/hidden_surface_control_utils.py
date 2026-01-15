@@ -30,22 +30,22 @@ class VirtualDisplayUtils:
 
     def start_hidden_app(self, device_id=None, name=""):
         cmd = f"adb -s {device_id} shell am start-foreground-service -a qualcomm.intent.action.VIRTUAL_DISPLAY_APP_LAUNCH --es target_component \"{name}\""
-        subprocess.check_output(cmd, shell=True)
+        subprocess.check_output(cmd, shell=True, creationflags=subprocess.CREATE_NO_WINDOW)
         return cmd
 
     def start_mirror_activity(self, device_id=None):
         cmd = f"adb -s {device_id} shell am start -n com.qualcomm.mobile.virtualdisplaydemo/.MirrorActivity"
-        subprocess.check_output(cmd, shell=True)
+        subprocess.check_output(cmd, shell=True, creationflags=subprocess.CREATE_NO_WINDOW)
         return cmd
 
     def take_screenshot(self, device_id=None):
         cmd = f"adb -s {device_id} shell am start-foreground-service -a qualcomm.intent.action.VIRTUAL_DISPLAY_CAPTURE"
-        subprocess.check_output(cmd, shell=True)
+        subprocess.check_output(cmd, shell=True, creationflags=subprocess.CREATE_NO_WINDOW)
         return cmd
 
     def touch_hidden_app(self, device_id=None, x=None, y=None):
         cmd = f"adb -s {device_id} shell am start-foreground-service -a qualcomm.intent.action.VIRTUAL_DISPLAY_TOUCH --es coordinates {int(x)}:{int(y)}"
-        subprocess.check_output(cmd, shell=True)
+        subprocess.check_output(cmd, shell=True, creationflags=subprocess.CREATE_NO_WINDOW)
         return cmd
 
     def android_shell_quote(self, s: str) -> str:
@@ -58,25 +58,25 @@ class VirtualDisplayUtils:
             "-a", "qualcomm.intent.action.VIRTUAL_DISPLAY_TEXT_INPUT",
             "--es", "text", quoted
         ]
-        subprocess.run(cmd)
+        subprocess.run(cmd, creationflags=subprocess.CREATE_NO_WINDOW)
         return cmd
 
     def scroll_hidden_app(self, device_id=None, startX=None, startY=None, endX=None, endY=None, steps=None, delayMs=None):
         cmd = f"adb -s {device_id} shell am start-foreground-service -a qualcomm.intent.action.VIRTUAL_DISPLAY_SCROLL --es scroll {int(startX)}:{int(startY)}:{int(endX)}:{int(endY)}:{int(steps)}:{int(delayMs)}"
-        subprocess.check_output(cmd, shell=True)
+        subprocess.check_output(cmd, shell=True, creationflags=subprocess.CREATE_NO_WINDOW)
         return cmd
 
     def send_back_key(self, device_id=None):
-        subprocess.check_output(f"adb -s {device_id} shell am start-foreground-service -a qualcomm.intent.action.VIRTUAL_DISPLAY_KEY_EVENT --es key_event back", shell=True)
+        subprocess.check_output(f"adb -s {device_id} shell am start-foreground-service -a qualcomm.intent.action.VIRTUAL_DISPLAY_KEY_EVENT --es key_event back", shell=True, creationflags=subprocess.CREATE_NO_WINDOW)
 
     def send_home_key(self, device_id=None):
         cmd = f"adb -s {device_id} shell am start-foreground-service -a qualcomm.intent.action.VIRTUAL_DISPLAY_KEY_EVENT --es key_event back_to_home"
-        subprocess.check_output(cmd, shell=True)
+        subprocess.check_output(cmd, shell=True, creationflags=subprocess.CREATE_NO_WINDOW)
         return cmd
 
     def stop_virtual_display_service(self, device_id=None):
         cmd = f"adb -s {device_id} shell am start-foreground-service -a qualcomm.intent.action.VIRTUAL_DISPLAY_EXIT"
-        subprocess.check_output(cmd, shell=True)
+        subprocess.check_output(cmd, shell=True, creationflags=subprocess.CREATE_NO_WINDOW)
         return cmd
 
     def open_physical_display(self, device_id=None, log_folder="."):
@@ -104,7 +104,7 @@ class VirtualDisplayUtils:
         """
         try:
             # Get display info from adb
-            result = subprocess.check_output(f"adb -s {device_id} shell dumpsys display", shell=True, text=True, encoding="utf-8")
+            result = subprocess.check_output(f"adb -s {device_id} shell dumpsys display", shell=True, text=True, encoding="utf-8", creationflags=subprocess.CREATE_NO_WINDOW)
             pattern = re.compile(r'DisplayInfo\{"([^"]+)"[^}]*displayId\s*=?\s*(\d+)')
             found = False
             for name, did in pattern.findall(result):
@@ -179,8 +179,8 @@ if __name__ == "__main__":
 
     virtual_app = "com.taobao.taobao/com.taobao.tao.welcome.Welcome"
     # physical_app = "com.android.launcher3/com.android.launcher3.uioverrides.QuickstepLauncher"
-    subprocess.check_output(f"adb -s {adb_id} root")
-    subprocess.check_output(f"adb -s {adb_id} shell rm -f /data/user/0/com.qualcomm.mobile.virtualdisplaydemo/cache/snapshot*.png")
+    subprocess.check_output(f"adb -s {adb_id} root", creationflags=subprocess.CREATE_NO_WINDOW)
+    subprocess.check_output(f"adb -s {adb_id} shell rm -f /data/user/0/com.qualcomm.mobile.virtualdisplaydemo/cache/snapshot*.png", creationflags=subprocess.CREATE_NO_WINDOW)
 
     # stop virtual display service additionally in cases of last failure abort
     vdu.stop_virtual_display_service(device_id=adb_id)
@@ -210,11 +210,11 @@ if __name__ == "__main__":
             vdu.take_screenshot(device_id=adb_id)
             sleep(3)
             # pull virtual display screenshots to local path
-            subprocess.check_output(f"adb -s {adb_id} pull /data/user/0/com.qualcomm.mobile.virtualdisplaydemo/cache {log_path}")
+            subprocess.check_output(f"adb -s {adb_id} pull /data/user/0/com.qualcomm.mobile.virtualdisplaydemo/cache {log_path}", creationflags=subprocess.CREATE_NO_WINDOW)
         elif cmd == "n":
             break
 
     # stop virtual display service
     vdu.stop_virtual_display_service(device_id=adb_id)
     # stop app on physical display
-    subprocess.check_output(f"adb -s {adb_id} shell am force-stop {virtual_app}")
+    subprocess.check_output(f"adb -s {adb_id} shell am force-stop {virtual_app}", creationflags=subprocess.CREATE_NO_WINDOW)

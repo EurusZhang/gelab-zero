@@ -268,19 +268,19 @@ def find_LAUNCH_SINGLE_TOP_activity(adb_id, package_name):
     try:
         # Step 1: Stop the package
         stop_cmd = f'adb -s {adb_id} shell am force-stop {package_name}'
-        subprocess.run(stop_cmd, shell=True, check=True, capture_output=True, text=True)
+        subprocess.run(stop_cmd, shell=True, check=True, capture_output=True, text=True, creationflags=subprocess.CREATE_NO_WINDOW)
         print(f"Stopped package: {package_name}")
         
         # Wait a moment for the package to fully stop
         time.sleep(1)
         
         # Step 2: Clear logcat buffer to avoid old logs
-        subprocess.run('adb logcat -c', shell=True, check=True, capture_output=True, text=True)
+        subprocess.run('adb logcat -c', shell=True, check=True, capture_output=True, text=True, creationflags=subprocess.CREATE_NO_WINDOW)
         
         # Step 3: Start the package (open to home/default interface)
         # Using monkey command to launch the main activity
         open_cmd = f'adb -s {adb_id} shell monkey -p {package_name} -c android.intent.category.LAUNCHER 1'
-        subprocess.run(open_cmd, shell=True, check=True, capture_output=True, text=True)
+        subprocess.run(open_cmd, shell=True, check=True, capture_output=True, text=True, creationflags=subprocess.CREATE_NO_WINDOW)
         print(f"Opened package: {package_name}")
         
         # Wait for the app to launch and generate logs
@@ -288,7 +288,7 @@ def find_LAUNCH_SINGLE_TOP_activity(adb_id, package_name):
         
         # Step 4: Get logcat and filter for LAUNCH_SINGLE_TOP
         logcat_cmd = f'adb -s {adb_id} shell "logcat -d -b all | grep LAUNCH_SINGLE_TOP"'
-        result = subprocess.run(logcat_cmd, shell=True, capture_output=True, text=True)
+        result = subprocess.run(logcat_cmd, shell=True, capture_output=True, text=True, creationflags=subprocess.CREATE_NO_WINDOW)
         
         if result.returncode != 0:
             print(f"Failed to get logcat: {result.stderr}")

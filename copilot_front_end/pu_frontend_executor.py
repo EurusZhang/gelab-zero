@@ -205,14 +205,15 @@ def _detect_screen_orientation(device_id):
             capture_output=True,  # 捕获 stdout/stderr（可选）
             encoding="utf-8",     # 编码（避免乱码）
             shell=False,          # 无需开启 shell（PowerShell 本身就是解释器）
-            check=False           # 是否抛出非0退出码异常（可选）
+            check=False,          # 是否抛出非0退出码异常（可选）
+            creationflags=subprocess.CREATE_NO_WINDOW
         )
 
     else:
         # Unix/Linux/Mac
         command = f'''{adb_command} shell dumpsys input | grep -m 1 -o -E "orientation=[0-9]" | head -n 1 | grep -m 1 -o -E "[0-9]"'''
 
-        result = subprocess.run(command, shell=True, capture_output=True, text=True)
+        result = subprocess.run(command, shell=True, capture_output=True, text=True, creationflags=subprocess.CREATE_NO_WINDOW)
 
 
     result_str = result.stdout.strip()
@@ -230,7 +231,7 @@ def _awake_activity(device_id=None, package_name=None, activity_name=None, print
     command = f"adb -s {device_id} shell am force-stop {package_name}"
     if print_command:
         print(f"Executing command: {command}")
-    subprocess.run(command, shell=True, capture_output=True, text=True)
+    subprocess.run(command, shell=True, capture_output=True, text=True, creationflags=subprocess.CREATE_NO_WINDOW)
     time.sleep(1)
     # firstly stop virtual display scrcpy
     vdu.taskkill_consoles()
@@ -447,7 +448,7 @@ def act_on_device(frontend_action, device_id, wm_size, print_command = False, re
             if print_command:
                 print(f"Executing command: {cmd}")
 
-            result = subprocess.run(cmd, shell=True, capture_output=True, text=True)
+            result = subprocess.run(cmd, shell=True, capture_output=True, text=True, creationflags=subprocess.CREATE_NO_WINDOW)
 
         return result
 
