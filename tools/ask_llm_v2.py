@@ -1,3 +1,4 @@
+import os
 import sys
 if "." not in sys.path:
     sys.path.append(".")
@@ -18,7 +19,7 @@ def ask_llm_anything(model_provider, model_name, messages, args= {
     "frequency_penalty": 0.0,
 }, resize_config=None):
 
-    with smart_open("config.yaml", "r", encoding="utf-8") as f:
+    with smart_open(f"{os.getcwd()}//config.yaml", "r", encoding="utf-8") as f:
         config = yaml.safe_load(f)
     model_config = config["model_config"]
 

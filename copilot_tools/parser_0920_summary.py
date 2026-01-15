@@ -52,7 +52,7 @@ from copy import deepcopy
 # 9. LONGPRESS：长按手机屏幕坐标，需包含长按的坐标位置 point。
 # 例如：action:LONGPRESS\tpoint:x,y
 # """
-with smart_open("config.yaml", "r", encoding="utf-8") as f:
+with smart_open(f"{os.getcwd()}//config.yaml", "r", encoding="utf-8") as f:
     config = yaml.safe_load(f)
 task_define_prompt = config["system_prompt"]
 

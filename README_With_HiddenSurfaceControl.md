@@ -6,6 +6,7 @@
   - `adb reboot`
   - Add scrcpy.exe path without any quotes into PC "System variables" as "SCRCPY_PATH"
 - Install ADBKeyboard by `adb install` and reboot to take effective
+- Run `python -m PyInstaller gelab_zero.spec` to export .exe
 
 # Attentions
 - If set "mirror_display_switch" as False, DO NOT open same app on physical display while that app is running on virtual display. Otherwise it will disrupt agent workflow on virtual display because same app will toggle back and forth between physical and virtual displays
@@ -28,6 +29,6 @@
   - [X] system prompts
   - [X] model_config.yaml info
   - [X] mirror display switch
-- [ ] Export to .exe
-  - [ ] support GUI with double clicks or running in console witout paras input
+- [X] Export to .exe
+  - [X] support GUI with double clicks
   - [ ] support running in console with task para input

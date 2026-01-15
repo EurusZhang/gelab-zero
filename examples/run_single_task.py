@@ -1,14 +1,18 @@
-
+import os
 import sys
 import time
 if "." not in sys.path:
     sys.path.append(".")
 import subprocess
-
+import yaml
 from copilot_agent_client.pu_client import evaluate_task_on_device
 from copilot_front_end.mobile_action_helper import list_devices, get_device_wm_size
 from copilot_agent_server.local_server import LocalServer
 from copilot_front_end.hidden_surface_control_utils import log_folder
+
+config_file = f"{os.getcwd()}//config.yaml"
+with open(config_file, "r", encoding="utf-8") as f:
+    config = yaml.safe_load(f)
 
 tmp_server_config = {
     "log_dir": f"{log_folder}/traces",
@@ -16,31 +20,8 @@ tmp_server_config = {
     "debug": False
 }
 
-
-local_model_config = {
-    "task_type": "parser_0922_summary",
-    "model_config": {
-        "model_name": "gelab-zero-4b-preview",
-        "model_provider": "vllm",
-        "args": {
-            "temperature": 0.1,
-            "top_p": 0.95,
-            "frequency_penalty": 0.0,
-            "max_tokens": 4096,
-        },
-        
-        # optional to resize image
-        # "resize_config": {
-        #     "is_resize": True,
-        #     "target_image_size": (756, 756)
-        # }
-    },
-
-    "max_steps": 400,
-    "delay_after_capture": 2,
-    "debug": False
-}
-
+local_model_config = config["rollout_config"]
+local_model_config["task_type"] = "parser_0922_summary"
 
 # ===== 新增：用于记录每步耗时 =====
 _step_times = []
@@ -65,10 +46,10 @@ def wrap_automate_step_with_timing(server_instance):
 
 if __name__ == "__main__":
 
-    #  # task = "打开微信，给柏茗，发helloworld"
-    # # task = "打开 给到 app，在主页，下滑寻找，员工权益-奋斗食代，帮我领劵。如果不能领取就退出。"
-    # # task = "open wechat to send a message 'helloworld' to 'TKJ'"
-    # #task = "去淘宝帮我买本书"
+     # task = "打开微信，给柏茗，发helloworld"
+    # task = "打开 给到 app，在主页，下滑寻找，员工权益-奋斗食代，帮我领劵。如果不能领取就退出。"
+    # task = "open wechat to send a message 'helloworld' to 'TKJ'"
+    #task = "去淘宝帮我买本书"
     # if len(sys.argv) < 2:
     #     print("❌ 错误：未传入任务参数！")
     #     print("📝 使用方法：")

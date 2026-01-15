@@ -9,3 +9,5 @@ model_config.yaml
 
 ###################
 *.pyc
+build
+dist

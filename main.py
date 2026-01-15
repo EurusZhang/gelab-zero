@@ -97,8 +97,8 @@ def format_jsonl_to_pretty_json(input_file, output_file):
     print(f"输出文件: {output_file}")
 
 
-input_file = r"C:\PathLink-Eurus\APT\Workspace\python\gelab-zero\running_log\server_log\os-copilot-local-eval-logs\2026-01-15_10-32-10-421725\traces\47e5067f-adea-489e-b1e3-34c3c447a802.jsonl"  # 你的输入文件名
-output_file = r"C:\PathLink-Eurus\APT\Workspace\python\gelab-zero\running_log\server_log\os-copilot-local-eval-logs\2026-01-15_10-32-10-421725\traces\output.jsonl"  # 输出文件名
+input_file = r"C:\PathLink-Eurus\APT\Workspace\python\gelab-zero\running_log\server_log\os-copilot-local-eval-logs\2026-01-15_17-02-13-374621\traces\b9fe5223-1fd4-467b-ac56-64b6a4bd36ac.jsonl"  # 你的输入文件名
+output_file = r"C:\PathLink-Eurus\APT\Workspace\python\gelab-zero\running_log\server_log\os-copilot-local-eval-logs\2026-01-15_17-02-13-374621\traces\output.jsonl"  # 输出文件名
 
 format_jsonl_to_pretty_json(input_file, output_file)
 

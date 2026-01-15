@@ -197,7 +197,7 @@ def _detect_screen_orientation(device_id):
         adb_command = f"adb -s {device_id}"
     if os.name == 'nt':
         # Windows
-        command = f'{adb_command}' + ''' shell dumpsys input | Select-String 'orientation=\d+' | Select -First 1 | % { $_.Matches.Value -replace 'orientation=', '' }'''
+        command = f'{adb_command}' + r''' shell dumpsys input | Select-String 'orientation=\d+' | Select -First 1 | % { $_.Matches.Value -replace 'orientation=', '' }'''
         
         # 使用 subprocess 运行 PowerShell 命令
         result = subprocess.run(
@@ -452,7 +452,4 @@ def act_on_device(frontend_action, device_id, wm_size, print_command = False, re
         return result
 
     else:
-        raise ValueError(f"Unsupported action type: {action_type}")    
-    
-        
-
+        raise ValueError(f"Unsupported action type: {action_type}")

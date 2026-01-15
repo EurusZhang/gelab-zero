@@ -164,9 +164,11 @@ class VirtualDisplayUtils:
 
 vdu = VirtualDisplayUtils()
 log_folder = f"running_log/server_log/os-copilot-local-eval-logs/{datetime.datetime.now().strftime("%Y-%m-%d_%H-%M-%S-%f")}"
-with open(f"{os.getcwd()}//config.yaml", "r", encoding="utf-8") as f:
+
+config_file = f"{os.getcwd()}//config.yaml"
+with open(config_file, "r", encoding="utf-8") as f:
     config = yaml.safe_load(f)
-mirror_display_switch = config["mirror_display_switch"]
+mirror_display_switch = config.get("mirror_display_switch", False)
 
 if __name__ == "__main__":
     adb_id="9deb5ba5"
@@ -216,7 +218,3 @@ if __name__ == "__main__":
     vdu.stop_virtual_display_service(device_id=adb_id)
     # stop app on physical display
     subprocess.check_output(f"adb -s {adb_id} shell am force-stop {virtual_app}")
-
-
-
-
