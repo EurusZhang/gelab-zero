@@ -161,7 +161,7 @@ exe = EXE(
     a.zipfiles,
     a.datas,
     [],
-    name='GelabZeroTaskRunner',
+    name='GelabZeroTaskRunner_v1.0.0',
     debug=False,
     bootloader_ignore_signals=False,
     strip=False,
@@ -174,5 +174,6 @@ exe = EXE(
     target_arch=None,
     codesign_identity=None,
     entitlements_file=None,
-    icon=None,  # You can add an icon file here if you have one
+    icon='app_icon.ico',  # Icon file for the executable
+    version='version_info.txt',  # Version information file
 )
