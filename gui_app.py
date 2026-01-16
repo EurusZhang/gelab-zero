@@ -236,7 +236,7 @@ class GelabZeroGUI:
         filename = filedialog.asksaveasfilename(
             defaultextension=".txt",
             filetypes=[("Text files", "*.txt"), ("All files", "*.*")],
-            initialfile=f"gelab_zero_log_{datetime.now().strftime('%Y%m%d_%H%M%S')}.txt"
+            initialfile=f"gui_log_{datetime.now().strftime('%Y%m%d_%H%M%S')}.txt"
         )
         if filename:
             try:
