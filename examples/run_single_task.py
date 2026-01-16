@@ -40,7 +40,7 @@ def wrap_automate_step_with_timing(server_instance):
         finally:
             duration = time.time() - step_start
             _step_times.append(duration)
-            print(f"Step {len(_step_times)} took: {duration:.2f} seconds")
+            print(f"[GELab-Zero] Step {len(_step_times)} took: {duration:.2f} seconds")
         return result
 
     # 替换实例方法
@@ -90,4 +90,4 @@ if __name__ == "__main__":
     total_time = time.time() - total_start
 
     # 在最后加一行总时间
-    print(f"总计执行时间为 {total_time} 秒")
+    print(f"[GELab-Zero] Total execution time is {total_time} s")

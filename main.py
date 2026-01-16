@@ -73,32 +73,34 @@ from tools.ask_llm_v2 import ask_llm_anything
 
 
 
-def format_jsonl_to_pretty_json(input_file, output_file):
-    """
-    将JSONL文件转换为带有换行格式的JSON文件
+# def format_jsonl_to_pretty_json(input_file, output_file):
+#     """
+#     将JSONL文件转换为带有换行格式的JSON文件
     
-    Args:
-        input_file: 输入的JSONL文件路径
-        output_file: 输出的格式化JSON文件路径
-    """
-    data_list = []
+#     Args:
+#         input_file: 输入的JSONL文件路径
+#         output_file: 输出的格式化JSON文件路径
+#     """
+#     data_list = []
     
-    # 读取JSONL文件
-    with open(input_file, 'r', encoding='utf-8') as f:
-        for line in f:
-            if line.strip():  # 跳过空行
-                data_list.append(json.loads(line))
+#     # 读取JSONL文件
+#     with open(input_file, 'r', encoding='utf-8') as f:
+#         for line in f:
+#             if line.strip():  # 跳过空行
+#                 data_list.append(json.loads(line))
     
-    # 写入格式化的JSON文件
-    with open(output_file, 'w', encoding='utf-8') as f:
-        json.dump(data_list, f, ensure_ascii=False, indent=2)
+#     # 写入格式化的JSON文件
+#     with open(output_file, 'w', encoding='utf-8') as f:
+#         json.dump(data_list, f, ensure_ascii=False, indent=2)
     
-    print(f"转换完成！共处理 {len(data_list)} 条记录")
-    print(f"输出文件: {output_file}")
+#     print(f"转换完成！共处理 {len(data_list)} 条记录")
+#     print(f"输出文件: {output_file}")
 
 
-input_file = r"C:\PathLink-Eurus\APT\Workspace\python\gelab-zero\running_log\server_log\os-copilot-local-eval-logs\2026-01-15_17-02-13-374621\traces\b9fe5223-1fd4-467b-ac56-64b6a4bd36ac.jsonl"  # 你的输入文件名
-output_file = r"C:\PathLink-Eurus\APT\Workspace\python\gelab-zero\running_log\server_log\os-copilot-local-eval-logs\2026-01-15_17-02-13-374621\traces\output.jsonl"  # 输出文件名
+# input_file = r"C:\PathLink-Eurus\APT\Workspace\python\gelab-zero\running_log\server_log\os-copilot-local-eval-logs\2026-01-15_17-02-13-374621\traces\b9fe5223-1fd4-467b-ac56-64b6a4bd36ac.jsonl"  # 你的输入文件名
+# output_file = r"C:\PathLink-Eurus\APT\Workspace\python\gelab-zero\running_log\server_log\os-copilot-local-eval-logs\2026-01-15_17-02-13-374621\traces\output.jsonl"  # 输出文件名
 
-format_jsonl_to_pretty_json(input_file, output_file)
+# format_jsonl_to_pretty_json(input_file, output_file)
 
+
+print(f"{'*'*10}\naaaa\n{'*'*10}")

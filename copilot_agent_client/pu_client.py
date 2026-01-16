@@ -101,7 +101,7 @@ def evaluate_task_on_device(agent_server, device_info, task, rollout_config, ext
         
     })
 
-    print(f"Session ID: {session_id}")
+    print(f"[GELab-Zero] Session ID: {session_id}")
 
     return_log = {
         "session_id": session_id,
@@ -124,7 +124,7 @@ def evaluate_task_on_device(agent_server, device_info, task, rollout_config, ext
     init_device(device_id)
 
     # firstly start hidden surface control from Setting view to Home view
-    print("Init hidden surface control screen")
+    print("[HiddenSurfaceControl] Init hidden surface control screen at start")
     _awake_activity(device_id, "com.android.settings", "com.android.settings/com.android.settings.homepage.SettingsHomepageActivity", True)
     press_home_key(device_id, print_command=True)
 
@@ -183,7 +183,7 @@ def evaluate_task_on_device(agent_server, device_info, task, rollout_config, ext
         history_actions.append(action)
 
 
-        print(f"Step {step_idx+1}/{max_steps} done. Action: {action}")
+        print(f"[GELab-Zero] Step {step_idx+1}/{max_steps} done. Action: {action}")
 
         if action['action_type'].upper() in ['COMPLETE', "ABORT"]:
             stop_reason = action['action_type'].upper()
@@ -203,7 +203,7 @@ def evaluate_task_on_device(agent_server, device_info, task, rollout_config, ext
 
     return_log['stop_steps'] = step_idx + 1
 
-    print(f"Task {task} done in {len(history_actions)} steps. Session ID: {session_id}")
+    print(f"[GELab-Zero] Task {task} done in {len(history_actions)} steps. Session ID: {session_id}")
 
     return return_log
 

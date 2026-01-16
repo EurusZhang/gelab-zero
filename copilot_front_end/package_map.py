@@ -269,7 +269,7 @@ def find_LAUNCH_SINGLE_TOP_activity(adb_id, package_name):
         # Step 1: Stop the package
         stop_cmd = f'adb -s {adb_id} shell am force-stop {package_name}'
         subprocess.run(stop_cmd, shell=True, check=True, capture_output=True, text=True, creationflags=subprocess.CREATE_NO_WINDOW)
-        print(f"Stopped package: {package_name}")
+        print(f"Stopped app: {package_name}")
         
         # Wait a moment for the package to fully stop
         time.sleep(1)
@@ -281,7 +281,7 @@ def find_LAUNCH_SINGLE_TOP_activity(adb_id, package_name):
         # Using monkey command to launch the main activity
         open_cmd = f'adb -s {adb_id} shell monkey -p {package_name} -c android.intent.category.LAUNCHER 1'
         subprocess.run(open_cmd, shell=True, check=True, capture_output=True, text=True, creationflags=subprocess.CREATE_NO_WINDOW)
-        print(f"Opened package: {package_name}")
+        print(f"Opened app: {package_name}")
         
         # Wait for the app to launch and generate logs
         time.sleep(5)
@@ -308,10 +308,10 @@ def find_LAUNCH_SINGLE_TOP_activity(adb_id, package_name):
                     cmp_value = match.group(1)
                     # The cmp value is in format: package_name/activity_name
                     # We want to return the full cmp value or just the activity name
-                    print(f"Found activity: {cmp_value}")
+                    print(f"[GELab-Zero] Found activity: {cmp_value}")
                     return cmp_value
         
-        print(f"No LAUNCH_SINGLE_TOP activity found for package: {package_name}")
+        print(f"[GELab-Zero] No LAUNCH_SINGLE_TOP activity found for package: {package_name}")
         return None
         
     except subprocess.CalledProcessError as e:
