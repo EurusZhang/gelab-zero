@@ -6,3 +6,4 @@ output/
 running_log
 tmp_gui_control
 gui_log.log
+*.mp4
