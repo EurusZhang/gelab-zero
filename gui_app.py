@@ -4,6 +4,7 @@ import threading
 import queue
 import time
 import yaml
+import json
 from datetime import datetime
 import tkinter as tk
 from tkinter import ttk, scrolledtext, messagebox, filedialog
@@ -79,7 +80,7 @@ class InputRedirector:
         return False
 
 class GelabZeroGUI:
-    def __init__(self, root, auto_start_task=None):
+    def __init__(self, root, auto_start_task=None, enable_control_server=True):
         self.root = root
         self.root.title("Gelab Zero Task Runner")
         self.root.geometry("1200x800")
@@ -106,11 +107,19 @@ class GelabZeroGUI:
         self.waiting_for_input = False
         self.input_start_pos = None
         
+        # Control server
+        self.control_server = None
+        self.control_server_running = False
+        
         # Setup UI
         self.setup_ui()
         
         # Start log update loop
         self.update_logs()
+        
+        # Start control server if enabled
+        if enable_control_server:
+            self.start_control_server()
         
         # Auto-start task if provided
         if self.auto_start_task:
@@ -462,29 +471,121 @@ class GelabZeroGUI:
         self.log("Auto-closing application...")
         self.root.quit()
         self.root.destroy()
+    
+    def start_control_server(self):
+        """Start the file-based control server"""
+        self.control_server_running = True
+        self.control_dir = Path("tmp_gui_control")
+        self.control_dir.mkdir(exist_ok=True)
+        
+        self.command_file = self.control_dir / "command.json"
+        self.response_file = self.control_dir / "response.json"
+        self.log_file = self.control_dir / "current_log.txt"
+        
+        # Start command monitoring thread
+        control_thread = threading.Thread(target=self.monitor_commands, daemon=True)
+        control_thread.start()
+        
+        self.log("Control server started on file-based IPC")
+    
+    def monitor_commands(self):
+        """Monitor for command files and process them"""
+        last_mtime = 0
+        
+        while self.control_server_running:
+            try:
+                if self.command_file.exists():
+                    current_mtime = self.command_file.stat().st_mtime
+                    
+                    if current_mtime > last_mtime:
+                        last_mtime = current_mtime
+                        
+                        # Read and process command
+                        try:
+                            with open(self.command_file, 'r', encoding='utf-8') as f:
+                                cmd_data = json.load(f)
+                            
+                            command = cmd_data.get("command")
+                            params = cmd_data.get("params", {})
+                            
+                            # Process command
+                            response = self.process_command(command, params)
+                            
+                            # Write response
+                            with open(self.response_file, 'w', encoding='utf-8') as f:
+                                json.dump(response, f)
+                            
+                        except Exception as e:
+                            print(f"Error processing command: {e}")
+                
+                # Update log file
+                try:
+                    log_content = self.log_text.get(1.0, tk.END)
+                    with open(self.log_file, 'w', encoding='utf-8') as f:
+                        f.write(log_content)
+                except:
+                    pass
+                
+                time.sleep(0.1)
+                
+            except Exception as e:
+                print(f"Error in command monitor: {e}")
+                time.sleep(1)
+    
+    def process_command(self, command, params):
+        """Process a control command"""
+        try:
+            if command == "set_task":
+                task = params.get("task", "")
+                self.root.after(0, lambda: self.task_entry.delete(0, tk.END))
+                self.root.after(0, lambda: self.task_entry.insert(0, task))
+                return {"status": "success", "message": f"Task set to: {task}"}
+            
+            elif command == "start":
+                task = params.get("task")
+                if task:
+                    self.root.after(0, lambda: self.task_entry.delete(0, tk.END))
+                    self.root.after(0, lambda: self.task_entry.insert(0, task))
+                self.root.after(0, self.start_task)
+                return {"status": "success", "message": "Task started"}
+            
+            elif command == "stop":
+                self.root.after(0, lambda: stop_flag.set())
+                return {"status": "success", "message": "Stop signal sent"}
+            
+            elif command == "clear_logs":
+                self.root.after(0, self.clear_logs)
+                return {"status": "success", "message": "Logs cleared"}
+            
+            elif command == "save_logs":
+                filepath = params.get("filepath")
+                if filepath:
+                    def save_to_file():
+                        try:
+                            with open(filepath, 'w', encoding='utf-8') as f:
+                                f.write(self.log_text.get(1.0, tk.END))
+                        except Exception as e:
+                            print(f"Error saving logs: {e}")
+                    self.root.after(0, save_to_file)
+                    return {"status": "success", "message": f"Logs saved to {filepath}"}
+                else:
+                    return {"status": "error", "message": "No filepath provided"}
+            
+            elif command == "close":
+                self.root.after(0, self.auto_close)
+                return {"status": "success", "message": "Closing application"}
+            
+            else:
+                return {"status": "error", "message": f"Unknown command: {command}"}
+                
+        except Exception as e:
+            return {"status": "error", "message": str(e)}
 
 def main():
-    # Check if task is provided as command-line argument
-    if len(sys.argv) > 1:
-        # Check for GUI mode with auto-start
-        if len(sys.argv) > 2 and sys.argv[2] == "--gui-auto":
-            # GUI mode with auto-start
-            task = sys.argv[1]
-            root = tk.Tk()
-            app = GelabZeroGUI(root, auto_start_task=task)
-            root.mainloop()
-        else:
-            # Invalid usage - only support GUI modes
-            print("Error: Only GUI modes are supported.")
-            print("Usage:")
-            print("  python gui_app.py                    # GUI mode")
-            print("  python gui_app.py <task> --gui-auto  # GUI auto-start mode")
-            sys.exit(1)
-    else:
-        # GUI mode
-        root = tk.Tk()
-        app = GelabZeroGUI(root)
-        root.mainloop()
+    # GUI mode
+    root = tk.Tk()
+    app = GelabZeroGUI(root)
+    root.mainloop()
 
 if __name__ == "__main__":
     main()
