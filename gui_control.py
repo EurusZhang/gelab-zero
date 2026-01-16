@@ -43,6 +43,7 @@ class GUIController:
                 try:
                     with open(self.response_file, 'r', encoding='utf-8') as f:
                         response = json.load(f)
+                    print(f"Response: {response}")
                     self.response_file.unlink()
                     return response
                 except:
@@ -137,7 +138,7 @@ def main():
         elif user_input == "save_log":
             # Save logs
             print("Saving logs...")
-            controller.save_logs(filepath="test_logs.txt")
+            controller.save_logs(filepath="gui_logs.txt")
             time.sleep(1)
         elif user_input == "close_gui":
             # Close gui
@@ -147,7 +148,7 @@ def main():
         elif user_input == "clean_up":
             # Cleanup
             controller.cleanup()
-            print("\nDone!")
+            print("Done!")
         elif user_input == "exit":
             break
 
