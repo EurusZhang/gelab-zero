@@ -15,7 +15,7 @@ from copilot_front_end.mobile_action_helper import capture_screenshot, dectect_s
 
 from copilot_front_end.mobile_action_helper import init_device, open_screen
 from copilot_front_end.pu_frontend_executor import act_on_device, uiTars_to_frontend_action, _awake_activity
-
+from copilot_front_end.hidden_surface_control_utils import vdu
 from megfile import smart_remove
 
 import time
@@ -118,6 +118,9 @@ def evaluate_task_on_device(agent_server, device_info, task, rollout_config, ext
 
     history_actions = []
 
+    # start adb logcat
+    vdu.start_adb_log(device_id)
+
     # init device for the first time
     device_id = device_info['device_id']
     open_screen(device_id)
@@ -204,6 +207,9 @@ def evaluate_task_on_device(agent_server, device_info, task, rollout_config, ext
     return_log['stop_steps'] = step_idx + 1
 
     print(f"[GELab-Zero] Task {task} done in {len(history_actions)} steps. Session ID: {session_id}")
+
+    # stop adb logcat
+    vdu.stop_adb_log()
 
     return return_log
 

@@ -17,6 +17,8 @@ import win32gui
 import win32con
 import datetime
 import yaml
+import threading
+from pathlib import Path
 from dotenv import load_dotenv
 from time import sleep
 
@@ -27,10 +29,62 @@ VIRTUAL_DISPLAY_NAME = "HiddenSurfaceControl"
 class VirtualDisplayUtils:
     def __init__(self):
         self.log_folder = ""
+        # adb logcat
+        self.adb_log_process = None
+        self.adb_log_thread = False
+        self.logcat_file = None
 
     def update_log_folder(self):
         self.log_folder = f"running_log/server_log/os-copilot-local-eval-logs/{datetime.datetime.now().strftime("%Y-%m-%d_%H-%M-%S-%f")}"
         return self.log_folder
+
+    def start_adb_log(self, device_id=None):
+        """
+        cmd:
+            'adb -s 11111 shell "logcat -b all"'
+            'adb -s 11111 shell "logcat | grep -E \'WeatherDS|NavigationDomainService|music_debug_tag|PluginManager|Qaior\'"'
+        """
+        self.adb_log_thread = False
+        def _log_thread():
+            try:
+                self.adb_log_process = subprocess.Popen(f'adb -s {device_id} shell "logcat -b all"', stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+                timestamp = datetime.datetime.now().strftime('%Y%m%d_%H%M%S')
+                self.logcat_file = Path(self.log_folder) / f"logcat_{timestamp}.log"
+                with open(self.logcat_file, "w", encoding="utf-8") as file:
+                    while not self.adb_log_thread:
+                        line_bytes = self.adb_log_process.stdout.readline()
+                        if not line_bytes:
+                            continue
+                        try:
+                            line = line_bytes.decode("utf-8")
+                        except UnicodeDecodeError:
+                            try:
+                                line = line_bytes.decode()
+                            except UnicodeDecodeError:
+                                continue
+                        file.write(line.rstrip("\n"))
+                print(f"Started adb logcat to: {self.logcat_file}")
+            except Exception:
+                print(f"Exception in: {sys._getframe().f_code.co_name}")
+            finally:
+                pass
+
+        self.log_thread = threading.Thread(target=_log_thread)
+        self.log_thread.start()
+
+    def stop_adb_log(self):
+        try:
+            self.adb_log_thread = True
+            self.adb_log_process.terminate()
+            self.adb_log_process.wait()
+            self.adb_log_process = None
+            self.log_thread.join()  # Wait for the logging thread to finish
+            sleep(3)  # Ensure the recording process has completely stopped
+            print(f"Stopped adb logcat to: {self.logcat_file}")
+        except Exception:
+            print(f"Exception in: {sys._getframe().f_code.co_name}")
+        finally:
+            pass
 
     def start_hidden_app(self, device_id=None, name=""):
         cmd = f"adb -s {device_id} shell am start-foreground-service -a qualcomm.intent.action.VIRTUAL_DISPLAY_APP_LAUNCH --es target_component \"{name}\""

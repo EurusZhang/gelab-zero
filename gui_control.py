@@ -138,7 +138,7 @@ def main():
         elif user_input == "save_log":
             # Save logs
             print("Saving logs...")
-            controller.save_logs(filepath="gui_logs.txt")
+            controller.save_logs(filepath="gui_log.log")
             time.sleep(1)
         elif user_input == "close_gui":
             # Close gui
