@@ -1,4 +1,14 @@
+# Features
+
+- Full mobile UI agent functions from GELab-Zero
+- Integrete Hidden Surface Control functions
+- Standalone GelabZeroTaskRunner.exe with GUI for friendly use
+- Support control for GelabZeroTaskRunner.exe into your python project with gui_control.py
+- Support configurable paras in config.yaml
+- Support adb logcat recording and screen recording
+
 # Setup
+
 - Install HiddenSurfaceControl APK
   - `adb root`
   - `adb remount`
@@ -14,9 +24,11 @@
 - Run `pyinstaller gelab_zero.spec` to export .exe
 
 # Attentions
+
 - If set "mirror_display_switch" as False, DO NOT open same app on physical display while that app is running on virtual display. Otherwise it will disrupt agent workflow on virtual display because same app will toggle back and forth between physical and virtual displays
 
 # Known Issues
+
 - For now, it is only available for Kaanapali 1.0 META and device can be rooted. Kaanapali 2.0 can be available in the future.
 - When virtual display is mirrored to physical screen, DO NOT try to click HOME or BACK or MULTI-TASK BUTTON in case of unexpected virtual display service exit, which is a known issue of HiddenSurfaceControl apk for now
 - Taobao
@@ -29,6 +41,7 @@
   - It keeps clicking phone number input box because no keyboard shows out so it thinks that it's not able to type
 
 # TODO
+
 - [X] Formatted trace jsonl file
 - [X] Support config.yaml file
   - [X] system prompts
@@ -38,4 +51,5 @@
   - [X] support GUI with double clicks
   - [X] support running in console with task para input
 - [X] Create new log folder when Start again
-- [ ] MCP
+- [ ] MCP functions
+- [ ] Add switch for Hidden Surface Control

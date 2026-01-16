@@ -47,7 +47,7 @@ class VirtualDisplayUtils:
         self.adb_log_thread = False
         def _log_thread():
             try:
-                self.adb_log_process = subprocess.Popen(f'adb -s {device_id} shell "logcat -b all"', stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+                self.adb_log_process = subprocess.Popen(f'adb -s {device_id} shell "logcat -b all"', stdout=subprocess.PIPE, stderr=subprocess.PIPE, creationflags=subprocess.CREATE_NO_WINDOW)
                 timestamp = datetime.datetime.now().strftime('%Y%m%d_%H%M%S')
                 self.logcat_file = Path(self.log_folder) / f"logcat_{timestamp}.log"
                 with open(self.logcat_file, "w", encoding="utf-8") as file:
