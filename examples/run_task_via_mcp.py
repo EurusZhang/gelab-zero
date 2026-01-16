@@ -17,9 +17,10 @@ async def ask_agent(task: str):
 async def async_list_tools():
     async with client:
         tools = await client.list_tools()
-        print("Supported tools:\n", json.dumps(tools, indent=4, ensure_ascii=False))
+        # Convert Tool objects to dictionaries for JSON serialization
+        tools_dict = [tool.model_dump() if hasattr(tool, 'model_dump') else tool.__dict__ for tool in tools]
+        print("Supported tools:\n", json.dumps(tools_dict, indent=4, ensure_ascii=False))
 
 
 
 asyncio.run(async_list_tools())
-

@@ -58,7 +58,7 @@ mcp_server_config:
     # the gui main model config
     "model_config": {
       "model_name": "gelab-zero-4b-preview",
-      "model_provider": "local",
+      "model_provider": "vllm",
 
       "args": {
         "temperature": 0.1,
@@ -91,7 +91,7 @@ mcp_server_config:
     "reply_config": {
       "model_config": {
         "model_name": "gelab-zero-4b-preview",
-        "model_provider": "local",
+        "model_provider": "vllm",
 
         "args": {
           "temperature": 0.5,
@@ -115,7 +115,7 @@ mcp_server_config:
     "caption_config": {
       "model_config": {
         "model_name": "gelab-zero-4b-preview",
-        "model_provider": "local",
+        "model_provider": "vllm",
 
         "args": {
           "temperature": 0.5,

@@ -50,3 +50,4 @@
 - [X] Create new log folder when Start again
 - [ ] MCP functions
 - [ ] Add switch for Hidden Surface Control
+- [ ] Sync latest repo
