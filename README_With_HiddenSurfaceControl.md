@@ -14,31 +14,28 @@
   - `adb remount`
   - `adb push HiddenSurfaceControl.apk /vendor/app`
   - `adb reboot`
-  - Add scrcpy.exe path without any quotes into PC "System variables" as "SCRCPY_PATH"
-- Add ADB tool path into path system variable
+- Add the path to scrcpy.exe to your PC’s System Variables (without quotes) and name the variable SCRCPY_PATH.
+- Add ADB tool path into system variable "Path".
 - How to enable typing on device
   - `adb push yadb /data/local/tmp/`
   - `adb install -r ADBKeyboard.apk`
   - Enable adbkeyboard in device Setting
   - `adb reboot`
-- Run `pyinstaller gelab_zero.spec` to export .exe
 
 # Attentions
 
-- If set "mirror_display_switch" as False, DO NOT open same app on physical display while that app is running on virtual display. Otherwise it will disrupt agent workflow on virtual display because same app will toggle back and forth between physical and virtual displays
+- If `mirror_display_switch` is set to False, do NOT open the same app on the physical display while it is running on the virtual display. Doing so will cause the app to switch repeatedly between the physical and virtual displays, disrupting the agent’s workflow.
 
 # Known Issues
 
-- For now, it is only available for Kaanapali 1.0 META and device can be rooted. Kaanapali 2.0 can be available in the future.
-- When virtual display is mirrored to physical screen, DO NOT try to click HOME or BACK or MULTI-TASK BUTTON in case of unexpected virtual display service exit, which is a known issue of HiddenSurfaceControl apk for now
+- Currently supported only on Kaanapali 1.0 META devices with root access. Will support for Kaanapali 2.0 may be added in the future.
+- When the virtual display is mirrored to the physical screen, do NOT tap HOME, BACK, or MULTI‑TASK buttons. Due to a known issue in the HiddenSurfaceControl APK, this may cause the virtual display service to exit unexpectedly.
 - Taobao
-  - Successful to slide and choose country code
-  - Successful to type (actually paste) phone number
-  - Fail to slide the slider to verify
-  - Fail to type (actually paste) verification code
-- Jingdong
-  - Need face recognization to log in
-  - It keeps clicking phone number input box because no keyboard shows out so it thinks that it's not able to type
+  - Fails to slide the verification slider.
+  - Fails to enter (via paste) the verification code.
+- Jingdong (JD)
+  - Login requires face recognition, blocking automated login.
+  - The agent repeatedly taps the phone number input box because no keyboard appears, leading the system to believe it cannot type.
 
 # TODO
 
