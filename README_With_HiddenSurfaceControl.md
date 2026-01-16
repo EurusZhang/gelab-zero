@@ -1,11 +1,11 @@
 # Features
 
-- Full mobile UI agent functions from GELab-Zero
-- Integrete Hidden Surface Control functions
-- Standalone GelabZeroTaskRunner.exe with GUI for friendly use
-- Support control for GelabZeroTaskRunner.exe into your python project with gui_control.py
-- Support configurable paras in config.yaml
-- Support adb logcat recording and screen recording
+- Full mobile UI agent capabilities powered by GELab‑Zero
+- Integrated Hidden Surface Control functionality
+- Standalone GUI tool: GelabZeroTaskRunner.exe for user‑friendly operation
+- Python integration via gui_control.py to control GelabZeroTaskRunner.exe from your project
+- Configurable parameters through config.yaml
+- Support for ADB logcat logging and screen recording
 
 # Setup
 
