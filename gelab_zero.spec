@@ -161,7 +161,7 @@ exe = EXE(
     a.zipfiles,
     a.datas,
     [],
-    name='GelabZeroTaskRunner_v1.0.0',
+    name='GelabZeroTaskRunner',
     debug=False,
     bootloader_ignore_signals=False,
     strip=False,
